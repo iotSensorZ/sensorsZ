@@ -51,7 +51,8 @@ const ChangePassword = () => {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+            <div className="bg-gradient-to-b from-gray-500 to-black flex justify-center items-center h-screen w-screen">
+            <div className="bg-white p-10 rounded-lg shadow-lg w-full max-w-md">
       <h1 className="text-4xl font-bold mb-4">Change Password</h1>
       {error && <p className="text-red-600 mb-4">{error}</p>}
       {message && <p className="text-green-600 mb-4">{message}</p>}
@@ -97,6 +98,7 @@ const ChangePassword = () => {
         </div>
         <Button type="submit" className="w-full">Change Password</Button>
       </form>
+    </div>
     </div>
   );
 };
