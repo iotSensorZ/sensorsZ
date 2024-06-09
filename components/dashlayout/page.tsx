@@ -63,15 +63,15 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <aside className={`bg-blue-600 text-white flex flex-col transition-width duration-300 ${isSidebarOpen ? 'w-64' : 'w-16'}`}>
+      <aside className={`bg-blue-600 text-white flex flex-col transition-width duration-300 ${isSidebarOpen ? 'w-64' : 'w-24'}`}>
         <div className="p-4 flex items-center justify-between">
           <span className="font-bold text-xl">
             <Link href='/dashboard'>
-            Dashboard
+            {isSidebarOpen?"Dashboard":" "}
             </Link>
             </span>
           <button onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
-            {isSidebarOpen ? <FaBars /> : <FaBars />}
+            {isSidebarOpen ? <FaBars className='text-2xl'/> : <FaBars />}
           </button>
         </div>
         <nav className="flex-grow">

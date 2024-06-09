@@ -54,11 +54,13 @@ const router = useRouter()
 
   const handleEdit = (id: string) => {
     // Logic to handle file editing
-    alert(`Edit file with id: ${id}`);
+    router.push(`/edit/${id}`);
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center h-full">Loading...</div>;
+    return <div className="flex items-center justify-center h-full">
+      
+    </div>;
   }
 
   if (error) {
@@ -96,7 +98,7 @@ const router = useRouter()
           <FaPlus className="text-4xl text-gray-600" />
         </CardContent>
       </Card>
-    </div>
+    </div>     
   );
 };
 

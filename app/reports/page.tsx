@@ -1,64 +1,94 @@
-// app/reports/page.tsx
+// components/ReportList.tsx
 'use client';
-
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { firestore } from '@/firebase/firebase';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
-import Link from 'next/link';
-import Layout from '@/components/dashlayout/page';
+import { Button } from '@/components/ui/button';
+import { MagnifyingGlassIcon, ArrowUpIcon, ArrowDownIcon } from '@heroicons/react/24/outline';
+import { useRouter } from 'next/navigation';
 
-const ReportsPage = () => {
+const ReportList = () => {
   const [reports, setReports] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [filteredReports, setFilteredReports] = useState<any[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortAscending, setSortAscending] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const reportsCollection = collection(firestore, 'reports');
-        const q = query(reportsCollection, orderBy('createdAt', 'desc'));
+        const q = query(collection(firestore, 'reports'), orderBy('createdAt', 'desc'));
         const querySnapshot = await getDocs(q);
-        const reportsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const reportsData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
         setReports(reportsData);
+        setFilteredReports(reportsData);
       } catch (err) {
-        setError('Failed to fetch reports');
         console.error('Error fetching reports:', err);
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchReports();
   }, []);
 
-  if (loading) {
-    return <div className="flex items-center justify-center h-full">Loading...</div>;
-  }
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    const filtered = reports.filter((report) =>
+      report.title.toLowerCase().includes(e.target.value.toLowerCase())
+    );
+    setFilteredReports(filtered);
+  };
 
-  if (error) {
-    return <div className="text-red-600">{error}</div>;
-  }
+  const handleSort = () => {
+    const sortedReports = [...filteredReports].sort((a, b) => {
+      if (sortAscending) {
+        return a.createdAt.seconds - b.createdAt.seconds;
+      } else {
+        return b.createdAt.seconds - a.createdAt.seconds;
+      }
+    });
+    setFilteredReports(sortedReports);
+    setSortAscending(!sortAscending);
+  };
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Reports</h1>
-      <ul className="space-y-4">
-        {reports.map((report) => (
-          <li key={report.id} className="bg-white p-4 rounded shadow-md">
-            <div className="flex justify-between items-center">
-              {/* <Link href={`/reports/${report.id}`}> */}
-                <p className="text-xl font-semibold text-blue-600">{report.title}</p>
-              {/* </Link> */}
-              <a href={report.url} className="text-sm text-blue-500 underline" target="_blank" rel="noopener noreferrer">
-                Download DOCX
-              </a>
-            </div>
-            <p className="text-gray-600 mt-2">{new Date(report.createdAt.seconds * 1000).toLocaleString()}</p>
-          </li>
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <input
+            type="text"
+            placeholder="Search reports..."
+            value={searchTerm}
+            onChange={handleSearch}
+            className="p-2 border border-gray-300 rounded"
+          />
+          <MagnifyingGlassIcon className="h-6 w-6 text-gray-500" />
+        </div>
+        <Button onClick={handleSort} className="flex items-center">
+          {sortAscending ? (
+            <ArrowUpIcon className="h-6 w-6 mr-2" />
+          ) : (
+            <ArrowDownIcon className="h-6 w-6 mr-2" />
+          )}
+          Sort by Date
+        </Button>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filteredReports.map((report) => (
+          <div key={report.id} className="p-4 border border-gray-300 rounded shadow">
+            <h2 className="text-xl font-bold mb-2">{report.title}</h2>
+            <p className="text-gray-600">{new Date(report.createdAt.seconds * 1000).toLocaleString()}</p>
+            <Button className="mt-2" onClick={() => router.push(`/reports/${report.id}`)}>
+              View Report
+            </Button>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };
 
-export default ReportsPage;
+export default ReportList;
