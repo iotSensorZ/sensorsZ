@@ -1,11 +1,14 @@
+// app/reports/[id]/page.tsx
 'use client';
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { firestore } from '@/firebase/firebase';
 import { doc, getDoc } from 'firebase/firestore';
+import { Button } from '@/components/ui/button';
 
-const ReportDetailPage = ({ params }: { params: { id: string } }) => {
-  const { id } = params;
+const ReportDetailPage = () => {
+  const params = useParams();
+  const { id } = params as { id: string };
   const [report, setReport] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -29,6 +32,15 @@ const ReportDetailPage = ({ params }: { params: { id: string } }) => {
     fetchReport();
   }, [id]);
 
+  const handleDownload = () => {
+    if (report && report.url) {
+      const link = document.createElement('a');
+      link.href = report.url;
+      link.download = `${report.title}.docx`;
+      link.click();
+    }
+  };
+
   if (loading) {
     return <div className="flex items-center justify-center h-full">Loading...</div>;
   }
@@ -43,7 +55,9 @@ const ReportDetailPage = ({ params }: { params: { id: string } }) => {
       <p className="text-gray-600 mb-4">
         {new Date(report.createdAt.seconds * 1000).toLocaleString()}
       </p>
-      <div dangerouslySetInnerHTML={{ __html: report.content }} />
+      <Button onClick={handleDownload} className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md shadow-sm">
+        Download Report
+      </Button>
     </div>
   );
 };

@@ -1,8 +1,6 @@
 // pages/edit/[id].tsx
-import FileEdit from '@/components/fileedit/page';
+import EditFile from '@/components/fileedit/page';
 
-const EditPage = ({ params }: { params: { id: string } }) => {
-  return <FileEdit fileId={params.id} />;
-};
-
-export default EditPage;
+export default function EditFilePage({ params }: { params: { id: string } }) {
+  return <EditFile params={params} />;
+}

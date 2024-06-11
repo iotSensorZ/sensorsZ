@@ -5,10 +5,13 @@ import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css'; // Import Quill styles
 import { Button } from '@/components/ui/button';
 import { firestore, storage } from '@/firebase/firebase';
-import { addDoc, collection } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import htmlDocx from 'html-docx-js/dist/html-docx';
 import { useRouter } from 'next/navigation';
+import { messaging, getToken } from '@/firebase/firebase';
+import { collection, addDoc } from 'firebase/firestore';
+import RequestPermission from '../requestpermission/page';
+
 // Custom toolbar for Quill
 const modules = {
   toolbar: [
@@ -69,10 +72,20 @@ const QuillEditor = () => {
         createdAt: new Date()
       });
 
+      const notification = {
+        title: 'New Report Added',
+        content: `A new report titled "${title}" has been added.`,
+        createdAt: new Date(),
+        read: false
+      };
+
+      await addDoc(collection(firestore, 'notifications'), notification);
+
       setSuccess('Report submitted successfully!');
       setTitle('');
       setEditorState('');
       router.push("/reports");
+
     } catch (err) {
       setError('Failed to submit report');
       console.error('Error submitting report:', err);

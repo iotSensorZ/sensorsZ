@@ -9,30 +9,36 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import 'react-quill/dist/quill.snow.css';
 import { PencilSquareIcon, DocumentCheckIcon } from '@heroicons/react/24/outline';
+import { useAuth } from '@/context/AuthContext'; // Ensure this path is correct
 
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
-const TxtEditor = ({ fileId }: { fileId: string }) => {
+const TxtEditor = ({ params }: { params: { id: string } }) => {
   const [content, setContent] = useState('');
   const [fileName, setFileName] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { currentUser } = useAuth(); // Use the useAuth hook to get current user
   const router = useRouter();
 
   useEffect(() => {
     const fetchFileContent = async () => {
       try {
-        const docRef = doc(firestore, 'files', fileId);
+        if (!currentUser) {
+          throw new Error('User not logged in');
+        }
+
+        const docRef = doc(firestore, 'users', currentUser.uid, 'files', params.id);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
           const fileData = docSnap.data();
-          const name = fileData.name; // Use the correct field name
+          const name = fileData.name;
           if (!name) {
             throw new Error('File name is undefined');
           }
           setFileName(name);
-          const fileRef = ref(storage, `files/${name}`);
+          const fileRef = ref(storage, `users/${currentUser.uid}/files/${name}`);
           const url = await getDownloadURL(fileRef);
 
           const response = await fetch(url);
@@ -41,7 +47,7 @@ const TxtEditor = ({ fileId }: { fileId: string }) => {
         } else {
           setError('File not found');
         }
-      } catch (err:any) {
+      } catch (err: any) {
         setError(`Failed to fetch file: ${err.message}`);
         console.error('Error fetching file:', err);
       } finally {
@@ -50,14 +56,19 @@ const TxtEditor = ({ fileId }: { fileId: string }) => {
     };
 
     fetchFileContent();
-  }, [fileId]);
+  }, [params.id, currentUser]);
 
   const handleSave = async () => {
+    if (!currentUser) {
+      setError('User not logged in');
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
 
       const blob = new Blob([content], { type: 'text/plain' });
-      const fileRef = ref(storage, `files/${fileName}`);
+      const fileRef = ref(storage, `users/${currentUser.uid}/files/${fileName}`);
       const uploadTask = uploadBytesResumable(fileRef, blob);
 
       uploadTask.on(
@@ -69,12 +80,12 @@ const TxtEditor = ({ fileId }: { fileId: string }) => {
         },
         async () => {
           const url = await getDownloadURL(uploadTask.snapshot.ref);
-          await updateDoc(doc(firestore, 'files', fileId), { url });
+          await updateDoc(doc(firestore, 'users', currentUser.uid, 'files', params.id), { url });
           alert('File updated successfully');
           router.push('/dashboard');
         }
       );
-    } catch (err:any) {
+    } catch (err: any) {
       setError(`Failed to save file: ${err.message}`);
       console.error('Error saving file:', err);
     } finally {

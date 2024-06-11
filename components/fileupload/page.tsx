@@ -1,53 +1,49 @@
 // components/FileUpload.tsx
-"use client"
+"use client";
 import { useState } from 'react';
-import { storage, firestore } from "@/firebase/firebase";
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { storage, firestore } from '@/firebase/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { collection, setDoc, doc } from 'firebase/firestore';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { FileType } from '@/types/file';
-import { useRouter } from "next/navigation";
-
 
 const FileUpload = () => {
+  const router = useRouter();
+  const { currentUser } = useAuth();
   const [file, setFile] = useState<File | null>(null);
-  const [error, setError] = useState('');
-const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFile(e.target.files?.[0] || null);
+    if (e.target.files) {
+      setFile(e.target.files[0]);
+    }
   };
 
   const handleUpload = async () => {
-    if (!file) {
-      setError('Please select a file to upload');
+    if (!file || !currentUser) {
+      setError('No file selected or user not authenticated');
       return;
     }
 
-    const storageRef = ref(storage, `files/${file.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, file);
+    const filePath = `users/${currentUser.uid}/files/${file.name}`;
+    const fileRef = ref(storage, filePath);
 
-    uploadTask.on(
-      'state_changed',
-      (snapshot) => {
-        // Handle progress, if needed
-      },
-      (error) => {
-        setError(error.message);
-      },
-      async () => {
-        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-        await addDoc(collection(firestore, 'files'), {
-          name: file.name,
-          url: downloadURL,
-          createdAt: serverTimestamp(),
-        } as FileType);
-        setFile(null);
-        setError('');
-        alert('File uploaded successfully');
-        router.push("/dashboard");
-      }
-    );
+    try {
+      await uploadBytes(fileRef, file);
+      const downloadURL = await getDownloadURL(fileRef);
+      await setDoc(doc(firestore, 'users', currentUser.uid, 'files', file.name), {
+        name: file.name,
+        url: downloadURL,
+        createdAt: new Date(),
+      });
+      alert('File uploaded successfully');
+      router.push('/dashboard')
+    } catch (error) {
+      setError('Failed to upload file');
+      console.error('Error uploading file:', error);
+    }
   };
 
   return (

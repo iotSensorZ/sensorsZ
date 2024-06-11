@@ -3,6 +3,9 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Layout from "@/components/dashlayout/page";
 import ClientSideLayout from "@/components/clientlayout/page";
+import RequestPermission from "@/components/requestpermission/page";
+import NotificationHandler from "@/components/handlenotification/page";
+import { AuthProvider } from "@/context/AuthContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,9 +23,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+      <AuthProvider>
         <ClientSideLayout>
+          {/* <RequestPermission/> */}
+          <NotificationHandler/>
         {children}
         </ClientSideLayout>
+        </AuthProvider>
         </body>
     </html>
   );
