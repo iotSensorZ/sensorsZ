@@ -17,10 +17,55 @@
 //   logger.info("Hello logs!", {structuredData: true});
 //   response.send("Hello from Firebase!");
 // });
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
+
+
+
+
+
+
+
+
+
+
+
+
+import * as functions from 'firebase-functions';
+import * as admin from 'firebase-admin';
+import * as express from 'express';
+import * as cors from 'cors';
 
 admin.initializeApp();
+const firestore = admin.firestore();
+
+const app = express();
+app.use(cors({ origin: true }));
+
+app.post('/sendMessage', async (req: express.Request, res: express.Response) => {
+  const { recipient, subject, body } = req.body;
+
+  // Default user handling (for example purposes)
+  const sender = 'defaultUserId'; // Replace this with actual user ID logic
+
+  const newMessage = {
+    sender,
+    recipient,
+    subject,
+    body,
+    timestamp: admin.firestore.FieldValue.serverTimestamp(),
+  };
+
+  try {
+    await firestore.collection('messages').add(newMessage);
+    res.status(200).send({ success: true });
+  } catch (error) {
+    console.error('Error sending message:', error);
+    res.status(500).send('Unable to send message');
+  }
+});
+
+exports.sendMessage = functions.https.onRequest(app);
+
+
 
 exports.notifyOnNewReport = functions.firestore
   .document('reports/{reportId}')
@@ -40,3 +85,6 @@ exports.notifyOnNewReport = functions.firestore
         console.error('Error adding notification:', error);
       });
   });
+
+
+

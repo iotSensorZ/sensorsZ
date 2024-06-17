@@ -16,7 +16,8 @@ import { FaCog } from '@react-icons/all-files/fa/FaCog';
 import { FaSignOutAlt } from '@react-icons/all-files/fa/FaSignOutAlt';
 import { FaKey } from '@react-icons/all-files/fa/FaKey';
 import { FaBars } from '@react-icons/all-files/fa/FaBars';
-
+import { FaCalendarAlt } from '@react-icons/all-files/fa/FaCalendarAlt';
+import { FaInbox } from "@react-icons/all-files/fa/FaInbox";
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
@@ -44,6 +45,31 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     return () => unsubscribe();
   }, [router]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 588) {
+        setIsSidebarOpen(false);
+      } else {
+        setIsSidebarOpen(true);
+      }
+    };
+
+    // Initialize the sidebar state based on current window size
+    handleResize();
+
+    // Add event listener for window resize
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup event listener on component unmount
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const handleToggleSidebar = () => {
+    if (window.innerWidth >= 588) {
+      setIsSidebarOpen(!isSidebarOpen);
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -63,35 +89,56 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <aside className={`bg-blue-600 text-white flex flex-col transition-width duration-300 ${isSidebarOpen ? 'w-64' : 'w-24'}`}>
+      <aside className={`bg-blue-600 text-white flex flex-col transition-width duration-300 ${isSidebarOpen ? 'w-64' : 'w-24'} `}>
         <div className="p-4 flex items-center justify-between">
           <span className="font-bold text-xl">
             <Link href='/dashboard'>
-            {isSidebarOpen?"Dashboard":" "}
+              {isSidebarOpen ? "Dashboard" : ("")}
             </Link>
-            </span>
-          <button onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
-            {isSidebarOpen ? <FaBars className='text-2xl'/> : <FaBars />}
+          </span>
+          <button onClick={handleToggleSidebar}>
+          {(window.innerWidth < 588)?<Link href='/dashboard'><FaBars className='text-xl'/></Link>: <FaBars className='text-2xl' />}
+           
           </button>
         </div>
         <nav className="flex-grow">
           <ul>
-            <li className="p-4 hover:bg-blue-700 flex items-center">
-              <FaHome className="mr-2" />
+            <Link href="/storage">
+            <li className="p-4  hover:bg-blue-700 flex items-center">
+              <FaHome className="mr-2 " />
               {isSidebarOpen && <Link href="/storage">Storage Space</Link>}
             </li>
+            </Link>
+            <Link href="/reports">
             <li className="p-4 hover:bg-blue-700 flex items-center">
               <FaFileAlt className="mr-2" />
               {isSidebarOpen && <Link href="/reports">Reports</Link>}
             </li>
+            </Link>
+              <Link href="/writereport">
             <li className="p-4 hover:bg-blue-700 flex items-center">
               <FaUsers className="mr-2" />
               {isSidebarOpen && <Link href="/writereport">Write Report</Link>}
             </li>
+              </Link>
+            <Link href="/communication">
             <li className="p-4 hover:bg-blue-700 flex items-center">
               <FaCog className="mr-2" />
               {isSidebarOpen && <Link href="/communication">Communication</Link>}
             </li>
+            </Link>
+            <Link href="/mycalendar">
+            <li className="p-4 hover:bg-blue-700 flex items-center">
+              <FaCalendarAlt className="mr-2" />
+              {isSidebarOpen && <Link href="/mycalendar">My Calendar</Link>}
+            </li>
+            </Link>
+            <Link href="/mycalendar">
+            <li className="p-4 hover:bg-blue-700 flex items-center">
+              <FaInbox className="mr-2" />
+              {isSidebarOpen && <Link href="/inbox">My Inbox</Link>}
+            </li>
+            </Link>
           </ul>
         </nav>
         <div className="p-4">

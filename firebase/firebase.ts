@@ -3,7 +3,7 @@ import { initializeApp,getApp,getApps } from "firebase/app";
 import {getAuth} from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+import { getMessaging, getToken, onMessage, isSupported } from 'firebase/messaging';
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAKZtOMo3aDGy-EzIZPmnVUh5jOv0f6cio",
@@ -21,5 +21,11 @@ const auth = getAuth(app);
 const firestore = getFirestore(app);
 const storage = getStorage(app);
 
-const messaging = getMessaging(app)
+let messaging;
+( async()=>{
+  if (typeof window !== "undefined" && await isSupported()){
+  messaging = getMessaging(app);
+}
+})()
+// const messaging = getMessaging(app)
 export {auth , firestore, app,storage,messaging,getToken,onMessage};

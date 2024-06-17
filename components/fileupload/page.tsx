@@ -47,9 +47,9 @@ const FileUpload = () => {
   };
 
   return (
-    <div>
+    <div className='m-5 text-center align-middle' >
       <Input type="file" onChange={handleFileChange} />
-      <Button onClick={handleUpload}>Upload</Button>
+      <Button className='m-5' onClick={handleUpload}>Upload</Button>
       {error && <p className="text-red-600">{error}</p>}
     </div>
   );
