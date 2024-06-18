@@ -1,16 +1,15 @@
 // components/QuillEditor.tsx
 'use client'
 import React, { useState } from 'react';
-import ReactQuill, { Quill } from 'react-quill';
+import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'; // Import Quill styles
 import { Button } from '@/components/ui/button';
 import { firestore, storage } from '@/firebase/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import htmlDocx from 'html-docx-js/dist/html-docx';
 import { useRouter } from 'next/navigation';
-import { messaging, getToken } from '@/firebase/firebase';
-import { collection, addDoc } from 'firebase/firestore';
-import RequestPermission from '../requestpermission/page';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { useAuth } from '@/context/AuthContext';
 
 // Custom toolbar for Quill
 const modules = {
@@ -37,20 +36,27 @@ const formats = [
 ];
 
 const QuillEditor = () => {
-    const [editorState, setEditorState] = useState('');
-    const [title, setTitle] = useState('');
-    const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
- const router = useRouter()
+  const [editorState, setEditorState] = useState('');
+  const [title, setTitle] = useState('');
+  const [isPublic, setIsPublic] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const { currentUser } = useAuth();
+  const router = useRouter();
+
   const handleChange = (value: string) => {
     setEditorState(value);
   };
-
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError(null);
     setSuccess(null);
+
+    if (!currentUser) {
+      setError('User not logged in');
+      return;
+    }
 
     try {
       // Create DOCX from HTML
@@ -69,17 +75,10 @@ const QuillEditor = () => {
       await addDoc(collection(firestore, 'reports'), {
         title,
         url: downloadURL,
-        createdAt: new Date()
+        createdAt: serverTimestamp(),
+        isPublic,
+        ownerId: currentUser.uid,
       });
-
-      const notification = {
-        title: 'New Report Added',
-        content: `A new report titled "${title}" has been added.`,
-        createdAt: new Date(),
-        read: false
-      };
-
-      await addDoc(collection(firestore, 'notifications'), notification);
 
       setSuccess('Report submitted successfully!');
       setTitle('');
@@ -116,7 +115,18 @@ const QuillEditor = () => {
             style={{ height: '300px' }}
           />
         </div>
-       
+        <div className="mb-4">
+          <label htmlFor="visibility" className="block text-sm font-medium text-gray-700">Visibility</label>
+          <select
+            id="visibility"
+            value={isPublic ? "public" : "private"}
+            onChange={(e) => setIsPublic(e.target.value === "public")}
+            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          >
+            <option value="private">Private</option>
+            <option value="public">Public</option>
+          </select>
+        </div>
         {error && <p className="text-red-600">{error}</p>}
         {success && <p className="text-green-600">{success}</p>}
         <Button type="submit" className="mt-12 w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md shadow-sm">

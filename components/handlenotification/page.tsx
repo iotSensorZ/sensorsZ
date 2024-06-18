@@ -15,23 +15,32 @@ const Notifications = () => {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       snapshot.docChanges().forEach((change) => {
         const report = change.doc.data();
-        const reportTimestamp = report.createdAt.seconds * 1000;
+        
+        if (report.createdAt) {
+          if (report.createdAt.seconds != null) {
+            const reportTimestamp = report.createdAt.seconds * 1000;
 
-        // Show notification only for new reports added after the last seen timestamp
-        if (change.type === 'added' && reportTimestamp > lastSeenTimestamp) {
-          console.log('New report added:', report);
-          toast.info(`New Report Added: ${report.title}`, {
-            position: 'top-right',
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });
+            // Show notification only for new reports added after the last seen timestamp
+            if (change.type === 'added' && reportTimestamp > lastSeenTimestamp) {
+              console.log('New report added:', report);
+              toast.info(`New Report Added: ${report.title}`, {
+                position: 'top-right',
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              });
 
-          // Update the last seen timestamp to the current report's timestamp
-          setLastSeenTimestamp(reportTimestamp);
+              // Update the last seen timestamp to the current report's timestamp
+              setLastSeenTimestamp(reportTimestamp);
+            }
+          } else {
+            console.log('Invalid createdAt.seconds:', report.createdAt);
+          }
+        } else {
+          console.log('Missing createdAt field in report:', report);
         }
       });
     });

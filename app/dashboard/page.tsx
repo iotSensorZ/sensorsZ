@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth, firestore, storage } from '@/firebase/firebase';
-import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, limit, getCountFromServer } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import { getDownloadURL, ref } from 'firebase/storage';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,6 +47,8 @@ const Dashboard = () => {
           id: doc.id, ...doc.data()
         }));
         setReports(reportdata);
+        const reportCount = await getCountFromServer(reportsRef);
+        setReponum(reportCount.data().count);
 
         const filesRef = collection(firestore, 'users', currentUser.uid, 'files');
         const filesQuery = query(filesRef, orderBy('createdAt', 'desc'), limit(5));
@@ -67,6 +69,8 @@ const Dashboard = () => {
         );
 
         setFiles(filedata);
+        const fileCount = await getCountFromServer(filesRef);
+        setFilenum(fileCount.data().count);
       } catch (err) {
         console.error("error fetching", err);
       }

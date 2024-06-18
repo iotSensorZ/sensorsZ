@@ -1,16 +1,17 @@
-// app/reports/[id]/page.tsx
 'use client';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { firestore } from '@/firebase/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/AuthContext';
 
 const ReportDetailPage = () => {
   const params = useParams();
   const { id } = params as { id: string };
   const [report, setReport] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const { currentUser } = useAuth();
 
   useEffect(() => {
     const fetchReport = async () => {
@@ -18,7 +19,12 @@ const ReportDetailPage = () => {
         const docRef = doc(firestore, 'reports', id);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          setReport(docSnap.data());
+          const reportData = docSnap.data();
+          if (reportData.isPublic || reportData.ownerId === currentUser?.uid) {
+            setReport(reportData);
+          } else {
+            console.error('You do not have permission to view this report.');
+          }
         } else {
           console.error('No such document!');
         }
@@ -30,7 +36,7 @@ const ReportDetailPage = () => {
     };
 
     fetchReport();
-  }, [id]);
+  }, [id, currentUser]);
 
   const handleDownload = () => {
     if (report && report.url) {
@@ -46,7 +52,7 @@ const ReportDetailPage = () => {
   }
 
   if (!report) {
-    return <div className="flex items-center justify-center h-full">Report not found</div>;
+    return <div className="flex items-center justify-center h-full">Report not found or you do not have permission to view this report.</div>;
   }
 
   return (

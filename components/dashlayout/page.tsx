@@ -121,12 +121,12 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
               {isSidebarOpen && <Link href="/writereport">Write Report</Link>}
             </li>
               </Link>
-            <Link href="/communication">
+            {/* <Link href="/communication">
             <li className="p-4 hover:bg-blue-700 flex items-center">
               <FaCog className="mr-2" />
               {isSidebarOpen && <Link href="/communication">Communication</Link>}
             </li>
-            </Link>
+            </Link> */}
             <Link href="/mycalendar">
             <li className="p-4 hover:bg-blue-700 flex items-center">
               <FaCalendarAlt className="mr-2" />

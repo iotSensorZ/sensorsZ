@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { firestore } from '@/firebase/firebase';
 import { collection, query, where, onSnapshot, getDocs, orderBy } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
+import Link from 'next/link';
 
 interface Message {
   id: string;
@@ -60,13 +61,17 @@ return (
       <h2 className="text-xl font-bold mb-4">Inbox</h2>
       <ul>
         {messages.map((message) => (
-          <li key={message.id} className="mb-4 p-4 border border-gray-300 rounded">
-            <p className="text-lg font-bold">{message.subject}</p>
-            <p>{message.message}</p>
-            <p className="text-sm text-gray-500">From: {message.senderEmail}</p>
-            <p className="text-sm text-gray-500">
+          <li key={message.id} className="mb-2 p-1 border border-gray-300 rounded cursor-pointer  bg-gray-200">
+              <Link href={`/inbox/${message.id}`}>
+            <div className='flex '>
+            <p className="text-lg font-medium">{message.subject}</p>
+            {/* <p>{message.message}</p> */}
+            <p className="text-sm text-gray-500 absolute right-20">
               {new Date(message.timestamp.seconds * 1000).toLocaleString()}
             </p>
+            </div>
+            <p className="text-sm text-gray-500">From: {message.senderEmail}</p>
+            </Link>
           </li>
         ))}
       </ul>
