@@ -116,12 +116,12 @@ const QuillEditor = () => {
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="visibility" className="block text-sm font-medium text-gray-700">Visibility</label>
+          <label htmlFor="visibility" className="block text-sm font-medium text-gray-700"></label>
           <select
             id="visibility"
             value={isPublic ? "public" : "private"}
             onChange={(e) => setIsPublic(e.target.value === "public")}
-            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            className="mt-14 block px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-blue-500 sm:text-sm"
           >
             <option value="private">Private</option>
             <option value="public">Public</option>
@@ -129,7 +129,7 @@ const QuillEditor = () => {
         </div>
         {error && <p className="text-red-600">{error}</p>}
         {success && <p className="text-green-600">{success}</p>}
-        <Button type="submit" className="mt-12 w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md shadow-sm">
+        <Button variant="blue" type="submit" className="mt-4 w-full text-white py-2 px-4 rounded-md shadow-sm">
           Submit Report
         </Button>
       </form>

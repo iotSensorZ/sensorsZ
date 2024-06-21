@@ -5,6 +5,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth, firestore } from "@/firebase/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore"; 
 import type { User } from "firebase/auth";
+import { Loader2 } from "lucide-react";
 
 export default function Home() {
   const router = useRouter();
@@ -64,7 +65,7 @@ export default function Home() {
   }, [router]);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <p className="flex justify-center"> <Loader2 className="animate-spin" /></p>
   }
 
   return (

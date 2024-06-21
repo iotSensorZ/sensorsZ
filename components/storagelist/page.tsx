@@ -5,6 +5,7 @@ import { firestore } from '@/firebase/firebase';
 import { useAuth } from '@/context/AuthContext'; // Updated import path
 import { collection, getDocs } from 'firebase/firestore';
 import { Card, CardContent, CardTitle, CardDescription } from "@/components/card/page";
+import { Loader2 } from 'lucide-react';
 
 const StorageList = () => {
   const [files, setFiles] = useState<any[]>([]);
@@ -35,7 +36,7 @@ const StorageList = () => {
   }, [currentUser]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <p className="flex justify-center"> <Loader2 className="animate-spin" /></p>
   }
 
   if (error) {

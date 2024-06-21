@@ -18,12 +18,21 @@ import { FaKey } from '@react-icons/all-files/fa/FaKey';
 import { FaBars } from '@react-icons/all-files/fa/FaBars';
 import { FaCalendarAlt } from '@react-icons/all-files/fa/FaCalendarAlt';
 import { FaInbox } from "@react-icons/all-files/fa/FaInbox";
+import { FaFileSignature } from "@react-icons/all-files/fa/FaFileSignature";
+import EmailManagement from '../EmailManagement/page';
+import Avatar from '@/public/images/avatar.jpg'
+import Image from 'next/image';
+import { Loader2 } from 'lucide-react';
+
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const router = useRouter();
+  const [activeLink, setActiveLink] = useState<string>('');
+  const [showEmailCard, setShowEmailCard] = useState(false);
+
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -36,6 +45,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
           setUserName(`${userData.firstName} ${userData.lastName}`);
         }
       } else {
+        setActiveLink('');
         router.push("/login");
       }
       setLoading(false);
@@ -84,14 +94,31 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+    return <p className="flex justify-center"> <Loader2 className="animate-spin" /></p>
   }
 
+  const handleSidebarItemClick = (href: string) => {
+    setActiveLink(href);
+  };
+  const isLinkActive = (href: string) => {
+    return activeLink === href ? 'bg-blue-100 text-blue-600 rounded-lg' : '';
+  };
+
+
+  const handleAvatarClick = () => {
+    setShowEmailCard(!showEmailCard);
+  };
+
+
+  const handleCloseCard = () => {
+    setShowEmailCard(false);
+  };
+
   return (
-    <div className="flex h-screen bg-gray-100">
-      <aside className={`bg-blue-600 text-white flex flex-col transition-width duration-300 ${isSidebarOpen ? 'w-64' : 'w-24'} `}>
+    <div className="flex h-screen bg-gray-50">
+      <aside className={`bg-white text-slate-600 flex flex-col transition-width duration-300 ${isSidebarOpen ? 'w-64' : 'w-24'} `}>
         <div className="p-4 flex items-center justify-between">
-          <span className="font-bold text-xl">
+          <span className="font-bold text-xl mt-5">
             <Link href='/dashboard'>
               {isSidebarOpen ? "Dashboard" : ("")}
             </Link>
@@ -102,43 +129,31 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
           </button>
         </div>
         <nav className="flex-grow">
-          <ul>
-            <Link href="/storage">
-            <li className="p-4  hover:bg-blue-700 flex items-center">
-              <FaHome className="mr-2 " />
-              {isSidebarOpen && <Link href="/storage">Storage Space</Link>}
+          <ul className='p-4'>
+          <li className={`p-4 mb-2 hover:bg-blue-100 hover:text-blue-600 hover:rounded-lg flex items-center ${isLinkActive('/dashboard')}`}>
+              <FaHome className="mr-2" />
+              {isSidebarOpen && <Link href="/dashboard" onClick={() => handleSidebarItemClick('/dashboard')}>Home</Link>}
             </li>
-            </Link>
-            <Link href="/reports">
-            <li className="p-4 hover:bg-blue-700 flex items-center">
-              <FaFileAlt className="mr-2" />
-              {isSidebarOpen && <Link href="/reports">Reports</Link>}
-            </li>
-            </Link>
-              <Link href="/writereport">
-            <li className="p-4 hover:bg-blue-700 flex items-center">
+          <li className={`p-4 mb-2 hover:bg-blue-100 hover:text-blue-600 hover:rounded-lg flex items-center ${isLinkActive('/storage')}`}>
               <FaUsers className="mr-2" />
-              {isSidebarOpen && <Link href="/writereport">Write Report</Link>}
+              {isSidebarOpen && <Link href="/storage" onClick={() => handleSidebarItemClick('/storage')}>Storage Space</Link>}
             </li>
-              </Link>
-            {/* <Link href="/communication">
-            <li className="p-4 hover:bg-blue-700 flex items-center">
-              <FaCog className="mr-2" />
-              {isSidebarOpen && <Link href="/communication">Communication</Link>}
+            <li className={`p-4 mb-2 hover:bg-blue-100 hover:text-blue-600 hover:rounded-lg flex items-center ${isLinkActive('/reports')}`}>
+              <FaFileAlt className="mr-2" />
+              {isSidebarOpen && <Link href="/reports" onClick={() => handleSidebarItemClick('/reports')}>Reports</Link>}
             </li>
-            </Link> */}
-            <Link href="/mycalendar">
-            <li className="p-4 hover:bg-blue-700 flex items-center">
+            <li className={`p-4 mb-2 hover:bg-blue-100 hover:text-blue-600 hover:rounded-lg flex items-center ${isLinkActive('/writereport')}`}>
+              <FaFileSignature className="mr-2" />
+              {isSidebarOpen && <Link href="/writereport" onClick={() => handleSidebarItemClick('/writereport')}>Write Report</Link>}
+            </li>
+            <li className={`p-4 mb-2 hover:bg-blue-100 hover:text-blue-600 hover:rounded-lg flex items-center ${isLinkActive('/mycalendar')}`}>
               <FaCalendarAlt className="mr-2" />
-              {isSidebarOpen && <Link href="/mycalendar">My Calendar</Link>}
+              {isSidebarOpen && <Link href="/mycalendar" onClick={() => handleSidebarItemClick('/mycalendar')}>My Calendar</Link>}
             </li>
-            </Link>
-            <Link href="/mycalendar">
-            <li className="p-4 hover:bg-blue-700 flex items-center">
+            <li className={`p-4 mb-2 hover:bg-blue-100 hover:text-blue-600 hover:rounded-lg flex items-center ${isLinkActive('/inbox')}`}>
               <FaInbox className="mr-2" />
-              {isSidebarOpen && <Link href="/inbox">My Inbox</Link>}
+              {isSidebarOpen && <Link href="/inbox" onClick={() => handleSidebarItemClick('/inbox')}>My Inbox</Link>}
             </li>
-            </Link>
           </ul>
         </nav>
         <div className="p-4">
@@ -154,19 +169,26 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       </aside>
       <div className="flex-1 flex flex-col">
         <header className="bg-white shadow p-4 flex justify-between items-center">
-          <div className="text-lg font-semibold">Welcome, {userName}</div>
+          <div className="text-lg font-medium text-slate-600">Welcome, {userName}</div>
           <div className="flex items-center">
-            <img
-              src="https://via.placeholder.com/40"
+            <Image
+              src={Avatar}
               alt="User Avatar"
-              className="rounded-full h-10 w-10"
+              className="rounded-full h-10 w-10 cursor-pointer"
+              onClick={handleAvatarClick}
             />
           </div>
         </header>
+        {showEmailCard && (
+          <div className=' fixed right-5 top-12 p-5'>
+            <EmailManagement onClose={handleCloseCard} />
+          </div>
+        )}
         <main className="p-4 flex-grow overflow-auto">
           {children}
         </main>
       </div>
+
     </div>
   );
 };

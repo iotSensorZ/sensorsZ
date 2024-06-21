@@ -11,6 +11,7 @@ import { FaEdit } from '@react-icons/all-files/fa/FaEdit';
 import { FaPlus } from '@react-icons/all-files/fa/FaPlus';
 import { Button } from "@/components/ui/button";
 import { useRouter } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 
 const StorageList = () => {
   const [files, setFiles] = useState<any[]>([]);
@@ -76,7 +77,7 @@ const StorageList = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <p className="flex justify-center"> <Loader2 className="animate-spin" /></p>
   }
 
   if (error) {
@@ -84,7 +85,7 @@ const StorageList = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className=" font-medium grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {files.map((file) => (
         <Card key={file.name} className="bg-white shadow-md">
           <CardContent>
@@ -101,7 +102,7 @@ const StorageList = () => {
                 <Button className="p-2" onClick={() => handleEdit(file.id)}>
                   <FaEdit />
                 </Button>
-                <Button className="p-2" onClick={() => handleDelete(file.id, file.name)}>
+                <Button variant="destructive" className="p-2" onClick={() => handleDelete(file.id, file.name)}>
                   <FaTrash />
                 </Button>
               </div>
@@ -109,11 +110,11 @@ const StorageList = () => {
           </CardContent>
         </Card>
       ))}
-      <Card className="bg-white shadow-md flex items-center justify-center cursor-pointer" onClick={() => router.push('/storage')}>
+      {/* <Card className="bg-white shadow-md flex items-center justify-center cursor-pointer" onClick={() => router.push('/storage')}>
         <CardContent>
           <FaPlus className="text-4xl text-gray-600" />
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   );
 };

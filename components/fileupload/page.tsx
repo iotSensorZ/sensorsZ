@@ -49,7 +49,7 @@ const FileUpload = () => {
   return (
     <div className='m-5 text-center align-middle' >
       <Input type="file" onChange={handleFileChange} />
-      <Button className='m-5' onClick={handleUpload}>Upload</Button>
+      <Button variant="blue" className='m-5' onClick={handleUpload}>Upload</Button>
       {error && <p className="text-red-600">{error}</p>}
     </div>
   );

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Poppins,Inter } from "next/font/google";
 import "./globals.css";
 import Layout from "@/components/dashlayout/page";
 import ClientSideLayout from "@/components/clientlayout/page";

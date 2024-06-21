@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import 'react-quill/dist/quill.snow.css';
 import { PencilSquareIcon, DocumentCheckIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '@/context/AuthContext'; // Ensure this path is correct
+import { Loader2 } from 'lucide-react';
 
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
@@ -94,7 +95,7 @@ const TxtEditor = ({ params }: { params: { id: string } }) => {
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center h-full">Loading...</div>;
+    return <p className="flex justify-center"> <Loader2 className="animate-spin" /></p>
   }
 
   if (error) {

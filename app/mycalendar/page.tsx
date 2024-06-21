@@ -46,6 +46,9 @@ const FullCalendarScheduler = () => {
     const calendarApi = selectInfo.view.calendar;
     calendarApi.unselect(); // clear date selection
 
+    //adding filter: events/meetings
+    
+
     if (title) {
       try {
         const newEvent = {

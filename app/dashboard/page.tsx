@@ -10,6 +10,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { onAuthStateChanged } from 'firebase/auth';
 import EmailModal from '@/components/SendEmail/page';
 import { FaMailBulk } from "@react-icons/all-files/fa/FaMailBulk";
+import EmailManagement from '@/components/EmailManagement/page';
+import InboxSwitcher from '@/components/InboxSwitcher/page';
+import Chat from '@/components/Chat/page';
+import Image from 'next/image';
+import Reportsvg from '@/public/images/reports.svg';
+import eventsvg from '@/public/images/events.svg';
+import filesvg from '@/public/images/files.svg';
+import inboxsvg from '@/public/images/inbox.svg';
+import { Grip } from 'lucide-react';
+
 const Dashboard = () => {
   const [reports, setReports] = useState<any[]>([]);
   const [files, setFiles] = useState<any[]>([]);
@@ -19,6 +29,7 @@ const Dashboard = () => {
   const { currentUser } = useAuth();
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+const [currentInbox, setCurrentInbox] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -84,32 +95,130 @@ const Dashboard = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4'>
+
+
+
+<div className='grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-4 mt-4'>
         <div>
-          <Card className='text-center'>
-            <CardHeader>
-              <CardTitle className='text-4xl'>{reponum}</CardTitle>
+          <Card className='text-center text-blue-600 bg-blue-100'>
+            <CardHeader className='flex justify-center items-center'>
+              <Image src={Reportsvg} alt='repo' width={60} height={60}/>
             </CardHeader>
+              <CardTitle className='text-4xl '>{reponum}
+              <p className='text-lg '>Reports</p>
+              <CardDescription className='font-light'>written</CardDescription>
+              </CardTitle>
             <CardContent>
-              <p className='text-lg'>Reports</p>
-              <CardDescription>written</CardDescription>
             </CardContent>
           </Card>
         </div>
         <div>
-          <Card className='text-center'>
-            <CardHeader>
-              <CardTitle className='text-4xl'>{filenum}</CardTitle>
+          <Card className='text-center text-yellow-600 bg-yellow-50'>
+            <CardHeader className='flex justify-center items-center'>
+              <Image src={filesvg} alt='repo' width={60} height={60}/>
             </CardHeader>
+              <CardTitle className='text-4xl '>{filenum}
+              <p className='text-lg '>Files</p>
+              <CardDescription className='font-light'>uploaded</CardDescription>
+              </CardTitle>
             <CardContent>
-              <p className='text-lg'>Files</p>
-              <CardDescription>uploaded</CardDescription>
+            </CardContent>
+          </Card>
+        </div>
+        <div>
+          <Card className='text-center text-red-600 bg-red-50'>
+            <CardHeader className='flex justify-center items-center'>
+              <Image src={eventsvg} alt='repo' width={60} height={60}/>
+            </CardHeader>
+              <CardTitle className='text-4xl '>{reponum}
+              <p className='text-lg '>Events</p>
+              <CardDescription className='font-light'>pending</CardDescription>
+              </CardTitle>
+            <CardContent>
+            </CardContent>
+          </Card>
+        </div>
+        <div>
+          <Card className='text-center text-violet-600 bg-violet-100'>
+            <CardHeader className='flex justify-center items-center'>
+              <Image src={inboxsvg} alt='repo' width={60} height={60}/>
+            </CardHeader>
+              <CardTitle className='text-4xl '>{reponum}
+              <p className='text-lg '>Inbox</p>
+              <CardDescription className='font-light'>received</CardDescription>
+              </CardTitle>
+            <CardContent>
             </CardContent>
           </Card>
         </div>
       </div>
 
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4'>
+
+
+
+
+
+
+
+      <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 mt-14'>
+        <div>
+          <Card className=''>
+              <CardDescription className='text-center mt-2'><Grip className='mx-4' />recent reports</CardDescription>
+            <CardContent>
+              <ul className='mt-4'>
+            {reports.map(report => (
+              <a key={report.id} href={report.url} target="_blank" rel="noopener noreferrer" className="text-slate-500 ">
+                <li key={report.id} className='transition ease-in-out delay-350 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-200 duration-300  mb-1  border border-blue-50 rounded p-1 flex'>
+                <Image src={Reportsvg} alt='repo' width={20} height={20}/>
+                <p className='mx-5'>{report.title}</p> 
+                </li>
+              </a>
+            ))}
+          </ul>
+            </CardContent>
+          </Card>
+        </div>
+        <div>
+          <Card className=''>
+              <CardDescription className='text-center mt-2'>  <Grip className='mx-4' />recent files</CardDescription>
+            <CardContent>
+              <ul className='mt-4'>
+            {reports.map(report => (
+              <a key={report.id} href={report.url} target="_blank" rel="noopener noreferrer" className="text-slate-500 ">
+                <li key={report.id} className='transition ease-in-out delay-350 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-200 duration-300  mb-1  border border-blue-50 rounded p-1 flex'>
+                <Image src={filesvg} alt='repo' width={20} height={20}/>
+                <p className='mx-5'>{report.title}</p> 
+                </li>
+              </a>
+            ))}
+          </ul>
+            </CardContent>
+          </Card>
+        </div>
+        <div>
+          <Card className=''>
+              <CardDescription className='text-center mt-2'><Grip className='mx-4' />recent events</CardDescription>
+            <CardContent>
+              <ul className='mt-4'>
+            {reports.map(report => (
+              <a key={report.id} href={report.url} target="_blank" rel="noopener noreferrer" className="text-slate-500 ">
+                <li key={report.id} className='transition ease-in-out delay-350 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-200 duration-300  mb-1  border border-blue-50 rounded p-1 flex'>
+                <Image src={eventsvg} alt='repo' width={20} height={20}/>
+                <p className='mx-5'>{report.title}</p> 
+                </li>
+              </a>
+            ))}
+          </ul>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+
+
+    
+
+      {/* <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4'>
         <div>
           <ul>
             {reports.map(report => (
@@ -132,7 +241,7 @@ const Dashboard = () => {
             ))}
           </ul>
         </div>
-      </div>
+      </div> */}
 
       {/* {currentUserId && <MessageList userId={currentUserId} />} */}
       
@@ -143,6 +252,9 @@ const Dashboard = () => {
         <FaMailBulk className='text-lg'/>
       </button>
      <EmailModal isOpen={isModalOpen} closeModal={closeModal}/>
+
+
+
     </div>
   );
 };
