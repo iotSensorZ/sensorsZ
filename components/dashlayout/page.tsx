@@ -116,7 +116,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <aside className={`bg-white text-slate-600 flex flex-col transition-width duration-300 ${isSidebarOpen ? 'w-64' : 'w-24'} `}>
+      <aside className={`bg-slate-600 text-white flex flex-col transition-width duration-300 ${isSidebarOpen ? 'w-64' : 'w-24'} `}>
         <div className="p-4 flex items-center justify-between">
           <span className="font-bold text-xl mt-5">
             <Link href='/dashboard'>
