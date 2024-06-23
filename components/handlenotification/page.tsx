@@ -5,7 +5,7 @@ import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const Notifications = () => {
+const Notifications: React.FC = () => {
   const [lastSeenTimestamp, setLastSeenTimestamp] = useState<number>(Date.now());
 
   useEffect(() => {

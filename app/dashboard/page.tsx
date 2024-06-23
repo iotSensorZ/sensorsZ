@@ -23,8 +23,10 @@ import { Grip } from 'lucide-react';
 const Dashboard = () => {
   const [reports, setReports] = useState<any[]>([]);
   const [files, setFiles] = useState<any[]>([]);
+  const [events, setEvents] = useState<any[]>([]);
   const [reponum, setReponum] = useState<any>('0');
   const [filenum, setFilenum] = useState<any>('0');
+  const [eventnum, setEventnum] = useState<any>('0');
   const [error, setError] = useState<string>('');
   const { currentUser } = useAuth();
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -82,6 +84,20 @@ const [currentInbox, setCurrentInbox] = useState<string | null>(null);
         setFiles(filedata);
         const fileCount = await getCountFromServer(filesRef);
         setFilenum(fileCount.data().count);
+
+
+        const EventsRef = collection(firestore, 'users', currentUser.uid, 'events');
+        const EventsQuery = query(EventsRef, orderBy('start', 'desc'), limit(5));
+        const EventsSnapshot = await getDocs(EventsQuery);
+        const EventData = EventsSnapshot.docs.map((doc) => ({
+          id: doc.id, ...doc.data()
+        }));
+        setEvents(EventData);
+
+        console.log("Events data:", EventData);
+        const eventCount = await getCountFromServer(EventsRef);
+        setEventnum(eventCount.data().count);
+
       } catch (err) {
         console.error("error fetching", err);
       }
@@ -130,7 +146,7 @@ const [currentInbox, setCurrentInbox] = useState<string | null>(null);
             <CardHeader className='flex justify-center items-center'>
               <Image src={eventsvg} alt='repo' width={60} height={60}/>
             </CardHeader>
-              <CardTitle className='text-4xl '>{reponum}
+              <CardTitle className='text-4xl '>{eventnum}
               <p className='text-lg '>Events</p>
               <CardDescription className='font-light'>pending</CardDescription>
               </CardTitle>
@@ -183,11 +199,11 @@ const [currentInbox, setCurrentInbox] = useState<string | null>(null);
               <CardDescription className='text-center mt-2'>  <Grip className='mx-4' />recent files</CardDescription>
             <CardContent>
               <ul className='mt-4'>
-            {reports.map(report => (
-              <a key={report.id} href={report.url} target="_blank" rel="noopener noreferrer" className="text-slate-500 ">
-                <li key={report.id} className='transition ease-in-out delay-350 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-200 duration-300  mb-1  border border-blue-50 rounded p-1 flex'>
+            {files.map(file => (
+              <a key={file.id} href={file.url} target="_blank" rel="noopener noreferrer" className="text-slate-500 ">
+                <li key={file.id} className='transition ease-in-out delay-350 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-200 duration-300  mb-1  border border-blue-50 rounded p-1 flex'>
                 <Image src={filesvg} alt='repo' width={20} height={20}/>
-                <p className='mx-5'>{report.title}</p> 
+                <p className='mx-5'>{file.name}</p> 
                 </li>
               </a>
             ))}
@@ -200,11 +216,11 @@ const [currentInbox, setCurrentInbox] = useState<string | null>(null);
               <CardDescription className='text-center mt-2'><Grip className='mx-4' />recent events</CardDescription>
             <CardContent>
               <ul className='mt-4'>
-            {reports.map(report => (
-              <a key={report.id} href={report.url} target="_blank" rel="noopener noreferrer" className="text-slate-500 ">
-                <li key={report.id} className='transition ease-in-out delay-350 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-200 duration-300  mb-1  border border-blue-50 rounded p-1 flex'>
+            {events.map(event => (
+              <a key={event.id} href={event.url} target="_blank" rel="noopener noreferrer" className="text-slate-500 ">
+                <li key={event.id} className='transition ease-in-out delay-350 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-200 duration-300  mb-1  border border-blue-50 rounded p-1 flex'>
                 <Image src={eventsvg} alt='repo' width={20} height={20}/>
-                <p className='mx-5'>{report.title}</p> 
+                <p className='mx-5'>{event.title}</p> 
                 </li>
               </a>
             ))}

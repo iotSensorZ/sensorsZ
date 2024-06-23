@@ -24,7 +24,7 @@ import Avatar from '@/public/images/avatar.jpg'
 import Image from 'next/image';
 import { Loader2 } from 'lucide-react';
 
-const Layout = ({ children }: { children: React.ReactNode }) => {
+const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -115,7 +115,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-100">
       <aside className={`bg-slate-600 text-white flex flex-col transition-width duration-300 ${isSidebarOpen ? 'w-64' : 'w-24'} `}>
         <div className="p-4 flex items-center justify-between">
           <span className="font-bold text-xl mt-5">
@@ -168,7 +168,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         </div>
       </aside>
       <div className="flex-1 flex flex-col">
-        <header className="bg-white shadow p-4 flex justify-between items-center">
+        <header className="bg-white shadow p-4 flex justify-between items-center z-50">
           <div className="text-lg font-medium text-slate-600">Welcome, {userName}</div>
           <div className="flex items-center">
             <Image

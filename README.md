@@ -57,6 +57,7 @@ overview of the firebase schema
 │   │   │       ├── start: string
 │   │   │       ├── end: string
 │   │   │       ├── AllDay: bool
+│   │   │       ├── event: event | meeting
 │   │   ├── emails
 │   │   │   ├── {eventId}
 │   │   │       ├── email: string
@@ -83,14 +84,5 @@ overview of the firebase schema
 │   │   ├── content: string
 │   │   ├── createdAt: timestamp
 │   │   ├── read: boolean
-│── messages
-│   ├── {messageId}
-│       ├── senderId: string
-│       ├── senderEmail: string
-│       ├── receiverId: string
-│       ├── receiverEmail: string
-│       ├── subject: string
-│       ├── message: string
-│       ├── timestamp: timestamp
 
 ```

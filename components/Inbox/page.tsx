@@ -137,7 +137,7 @@ const Inbox: React.FC = () => {
         </div>
         <ul>
   {messages.map((message) => (
-    <li key={message.id} className="grid grid-cols-4 gap-4 mb-2 p-1 border border-gray-200 rounded cursor-pointer">
+    <li key={message.id} className="grid grid-cols-4 gap-4 mb-2 p-1 border border-gray-200 hover:bg-slate-100 rounded cursor-pointer">
       <Link href={`/inbox/${message.id}`} className="contents">
         <div className='flex items-center col-span-1'>
           <MailOpen style={{ color: "gray" }} />
