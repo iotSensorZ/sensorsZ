@@ -41,6 +41,7 @@ const QuillEditor = () => {
   const [title, setTitle] = useState('');
   const [isPublic, setIsPublic] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const { currentUser } = useAuth();
   const router = useRouter();
 
@@ -98,18 +99,24 @@ const QuillEditor = () => {
       toast.error('Editor content is empty');
       return;
     }
-  
+
     try {
       const response = await axios.post('/api/paraphrase', { text: editorState });
-      const paraphrasedText = response.data.result; // Adjust this line based on actual API response structure
-      setEditorState(paraphrasedText);
+      console.log("txt",response.data.result)
+      const paraphrasedText = response.data.result.results.map((item: any) => item.replacement);
+ console.log("para",paraphrasedText)
+      // setEditorState(paraphrasedText);
+      setSuggestions(paraphrasedText);
       toast.success('Text paraphrased successfully');
     } catch (err) {
       toast.error('Failed to paraphrase text');
       console.error('Error paraphrasing text:', err);
     }
   };
-  
+  const handleSuggestionClick = (suggestion: string) => {
+    setEditorState(suggestion);
+    setSuggestions([]);
+  };
 
 
   return (
@@ -150,13 +157,32 @@ const QuillEditor = () => {
           </select>
         </div>
         {error && <p className="text-red-600">{error}</p>}
-        <Button variant="blue" type="submit" className="mt-4 w-full text-white py-2 px-4 rounded-md shadow-sm">
+
+        <div className="flex justify-between">
+        <Button variant="blue" type="submit" className="mt-4  text-white py-2 px-4 rounded-md shadow-sm">
           Submit Report
         </Button>
-        <Button variant="blue" type="button" onClick={handleParaphrase} className="mt-4 w-full text-white py-2 px-4 rounded-md shadow-sm">
-          Paraphrase Text
+        <Button variant="blue" type="button" onClick={handleParaphrase} className="mt-4 text-white py-2 px-4 rounded-md shadow-sm">
+          Generate Suggestions
         </Button>
+        </div>
       </form>
+      {suggestions.length > 0 && (
+        <div className="suggestions-container mt-4  shadow-lg rounded-lg p-4">
+          <h3 className="text-lg font-medium text-gray-700 mb-2">Suggestions</h3>
+          <ul>
+            {suggestions.map((suggestion, index) => (
+              <li 
+                key={index} 
+                className="cursor-pointer p-2 rounded-md bg-green-50 mb-2 text-blue-500 hover:bg-blue-100 transition"
+                onClick={() => handleSuggestionClick(suggestion)}
+              >
+                {suggestion}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
