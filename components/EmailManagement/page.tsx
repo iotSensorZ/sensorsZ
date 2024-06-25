@@ -5,6 +5,7 @@ import { sendEmailVerification, reload } from "firebase/auth";
 import { addDoc, collection, getDocs, updateDoc, doc } from "firebase/firestore";
 import { Button } from "../ui/button";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface UserEmail {
   id: string;
@@ -46,7 +47,7 @@ const EmailManagement: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     const user = auth.currentUser;
     if (user) {
       await sendEmailVerification(user);
-      alert("Verification email sent. Please check your inbox.");
+     toast.info("Verification email sent. Please check your inbox.");
     }
 
     setNewEmail("");
@@ -87,10 +88,11 @@ const EmailManagement: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         const emailDoc = doc(firestore, "users", currentUser.uid, "emails", emailId);
         await updateDoc(emailDoc, { verified: true });
       } else {
-        alert("Please verify your email from the link sent to your inbox.");
+        toast.info("Please verify your email from the link sent to your inbox.");
       }
     } catch (error) {
       console.error("Error verifying email:", error);
+      toast.error("Error verifying email:");
     }
   };
 

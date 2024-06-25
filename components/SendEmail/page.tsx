@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useAuth } from '@/context/AuthContext';
 import { Textarea } from "../ui/textarea";
+import { toast } from "sonner";
 
 interface EmailFormData {
   receiverId: string;
@@ -137,7 +138,7 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, closeModal }) => {
         if (!receiverId) {
             setEmailNotFound(true);
             console.error("Receiver email not found in the user's emails");
-            alert("Receiver email not found in the user's emails");
+            toast.error("Receiver email not found in the user's emails");
             return;
         }
 
@@ -153,7 +154,7 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, closeModal }) => {
             senderEmail: selectedSenderEmail,
             timestamp: serverTimestamp(),
         });
-        alert("Message Sent");
+        toast.success("Message Sent");
         reset();
         closeModal();
     } catch (error) {

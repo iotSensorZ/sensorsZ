@@ -6,6 +6,7 @@ import ClientSideLayout from "@/components/clientlayout/page";
 import RequestPermission from "@/components/requestpermission/page";
 import NotificationHandler from "@/components/handlenotification/page";
 import { AuthProvider } from "@/context/AuthContext";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,6 +28,7 @@ export default function RootLayout({
         <ClientSideLayout>
           {/* <RequestPermission/> */}
           <NotificationHandler/>
+          <Toaster position="top-center" richColors />
         {children}
         </ClientSideLayout>
         </AuthProvider>

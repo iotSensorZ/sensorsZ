@@ -10,7 +10,8 @@ import htmlDocx from 'html-docx-js/dist/html-docx';
 import { useRouter } from 'next/navigation';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
-
+import { toast, Toaster } from 'sonner';
+import axios from 'axios'
 // Custom toolbar for Quill
 const modules = {
   toolbar: [
@@ -40,7 +41,6 @@ const QuillEditor = () => {
   const [title, setTitle] = useState('');
   const [isPublic, setIsPublic] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const { currentUser } = useAuth();
   const router = useRouter();
 
@@ -51,10 +51,10 @@ const QuillEditor = () => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError(null);
-    setSuccess(null);
 
     if (!currentUser) {
       setError('User not logged in');
+      toast.error('User not logged in');
       return;
     }
 
@@ -80,19 +80,41 @@ const QuillEditor = () => {
         ownerId: currentUser.uid,
       });
 
-      setSuccess('Report submitted successfully!');
+      toast.success('Report submitted successfully!');
       setTitle('');
       setEditorState('');
       router.push("/reports");
 
     } catch (err) {
-      setError('Failed to submit report');
+      toast.error('Failed to submit report');
+      // setError('Failed to submit report');
+      toast.error('Failed to submit report');
       console.error('Error submitting report:', err);
     }
   };
 
+  const handleParaphrase = async () => {
+    if (!editorState) {
+      toast.error('Editor content is empty');
+      return;
+    }
+  
+    try {
+      const response = await axios.post('/api/paraphrase', { text: editorState });
+      const paraphrasedText = response.data.result; // Adjust this line based on actual API response structure
+      setEditorState(paraphrasedText);
+      toast.success('Text paraphrased successfully');
+    } catch (err) {
+      toast.error('Failed to paraphrase text');
+      console.error('Error paraphrasing text:', err);
+    }
+  };
+  
+
+
   return (
     <div className="quill-editor-container">
+      {/* <Toaster richColors /> */}
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label htmlFor="title" className="block text-sm font-medium text-gray-700">Title</label>
@@ -116,21 +138,23 @@ const QuillEditor = () => {
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="visibility" className="block text-sm font-medium text-gray-700"></label>
+          <label htmlFor="visibility" className="block text-sm font-medium text-gray-700">Visibility</label>
           <select
             id="visibility"
             value={isPublic ? "public" : "private"}
             onChange={(e) => setIsPublic(e.target.value === "public")}
-            className="mt-14 block px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-blue-500 sm:text-sm"
+            className="mt-1 block px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           >
             <option value="private">Private</option>
             <option value="public">Public</option>
           </select>
         </div>
         {error && <p className="text-red-600">{error}</p>}
-        {success && <p className="text-green-600">{success}</p>}
         <Button variant="blue" type="submit" className="mt-4 w-full text-white py-2 px-4 rounded-md shadow-sm">
           Submit Report
+        </Button>
+        <Button variant="blue" type="button" onClick={handleParaphrase} className="mt-4 w-full text-white py-2 px-4 rounded-md shadow-sm">
+          Paraphrase Text
         </Button>
       </form>
     </div>

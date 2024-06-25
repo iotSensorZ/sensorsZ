@@ -12,6 +12,7 @@ import { FaPlus } from '@react-icons/all-files/fa/FaPlus';
 import { Button } from "@/components/ui/button";
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const StorageList = () => {
   const [files, setFiles] = useState<any[]>([]);
@@ -38,7 +39,7 @@ const StorageList = () => {
               const downloadURL = await getDownloadURL(fileRef);
               return { ...fileData, id: doc.id, url: downloadURL };
             } catch (err) {
-              console.error('Error getting download URL:', err);
+              toast.error('Error getting download URL:');
               return null;
             }
           })
@@ -46,7 +47,7 @@ const StorageList = () => {
         setFiles(filesData.filter(file => file)); // Filter out null values
       } catch (err) {
         setError('Failed to fetch files');
-        console.error('Error fetching files:', err);
+        toast.error('Error fetching files:');
       } finally {
         setLoading(false);
       }
@@ -65,9 +66,10 @@ const StorageList = () => {
       await deleteObject(fileRef);
       await deleteDoc(doc(firestore, 'users', currentUser.uid, 'files', name));
       setFiles(files.filter(file => file.id !== id));
-      alert('File deleted successfully');
+      toast.success('File deleted successfully');
     } catch (err) {
-      setError('Failed to delete file');
+      toast.error('Failed to delete file');
+      // setError('Failed to delete file');
       console.error('Error deleting file:', err);
     }
   };

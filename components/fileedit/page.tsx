@@ -11,6 +11,7 @@ import 'react-quill/dist/quill.snow.css';
 import { PencilSquareIcon, DocumentCheckIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '@/context/AuthContext'; // Ensure this path is correct
 import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
@@ -77,12 +78,13 @@ const TxtEditor = ({ params }: { params: { id: string } }) => {
         null,
         (error) => {
           setError(`Failed to save file: ${error.message}`);
-          console.error('Error saving file:', error);
+          toast.error('Error saving file:');
+          // console.error('Error saving file:', error);
         },
         async () => {
           const url = await getDownloadURL(uploadTask.snapshot.ref);
           await updateDoc(doc(firestore, 'users', currentUser.uid, 'files', params.id), { url });
-          alert('File updated successfully');
+          toast.success('File updated successfully');
           router.push('/dashboard');
         }
       );

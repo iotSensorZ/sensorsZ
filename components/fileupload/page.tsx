@@ -8,6 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
 
 const FileUpload = () => {
   const router = useRouter();
@@ -38,10 +39,10 @@ const FileUpload = () => {
         url: downloadURL,
         createdAt: new Date(),
       });
-      alert('File uploaded successfully');
+    toast.success('File uploaded successfully');
       router.push('/dashboard')
     } catch (error) {
-      setError('Failed to upload file');
+    toast.error('Failed to upload file');
       console.error('Error uploading file:', error);
     }
   };

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { reauthenticateWithCredential, EmailAuthProvider, updatePassword } from 'firebase/auth';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 const ChangePassword = () => {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -20,6 +21,7 @@ const ChangePassword = () => {
     setError(null);
     setMessage(null);
     if(newPassword !== confirmPassword){
+        toast.error("New passwords do not match");
         setError("New passwords do not match");
         return;
     }
@@ -33,7 +35,8 @@ const ChangePassword = () => {
         );
         await reauthenticateWithCredential(user, credential);
         await updatePassword(user, newPassword);
-        setMessage("Password updated successfully!");
+        toast.success("Password updated successfully!");
+        // setMessage("Password updated successfully!");
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
