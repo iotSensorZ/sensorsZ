@@ -60,3 +60,6 @@ overview of the firebase schema
 │   │   ├── read: boolean
 
 ```
+
+![Screenshot (16)](https://github.com/iotSensorZ/sensorsZ/assets/172040357/4e66ef06-4644-45cf-848e-91aa80515586)
+
