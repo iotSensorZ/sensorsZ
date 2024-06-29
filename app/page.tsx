@@ -65,7 +65,11 @@ export default function Home() {
   }, [router]);
 
   if (loading) {
-    return <p className="flex justify-center"> <Loader2 className="animate-spin" /></p>
+    return (
+      <div className="flex justify-center items-center mt-4">
+        <div className="loader border-t-4 border-blue-500 border-solid rounded-full w-8 h-8 animate-spin"></div>
+      </div>
+    )
   }
 
   return (

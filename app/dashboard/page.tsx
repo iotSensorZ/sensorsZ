@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth, firestore, storage } from '@/firebase/firebase';
-import { collection, getDocs, query, orderBy, limit, getCountFromServer } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, limit, getCountFromServer, doc, getDoc } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import { getDownloadURL, ref } from 'firebase/storage';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,16 +27,25 @@ const Dashboard = () => {
   const [reponum, setReponum] = useState<any>('0');
   const [filenum, setFilenum] = useState<any>('0');
   const [eventnum, setEventnum] = useState<any>('0');
+  const [inboxnum, setInboxnum] = useState<any>('0');
   const [error, setError] = useState<string>('');
   const { currentUser } = useAuth();
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 const [currentInbox, setCurrentInbox] = useState<string | null>(null);
+const [userName, setUserName] = useState<string | null>(null);
+
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user && user.uid) {
         setCurrentUserId(user.uid);
+        const userDocRef = doc(firestore, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          setUserName(`${userData.firstName} ${userData.lastName}`);
+        }
       } else {
         setCurrentUserId(null);
       }
@@ -98,6 +107,19 @@ const [currentInbox, setCurrentInbox] = useState<string | null>(null);
         const eventCount = await getCountFromServer(EventsRef);
         setEventnum(eventCount.data().count);
 
+
+        const InboxRef = collection(firestore, 'users', currentUser.uid, 'messages');
+        // const InboxQuery = query(InboxRef, orderBy('start', 'desc'), limit(5));
+        // const InboxSnapshot = await getDocs(InboxQuery);
+        // const InboxData = InboxSnapshot.docs.map((doc) => ({
+        //   id: doc.id, ...doc.data()
+        // }));
+        // setInbox(InboxData);
+
+        // console.log("Events data:", InboxData);
+        const inboxCount = await getCountFromServer(InboxRef);
+        setInboxnum(inboxCount.data().count);
+
       } catch (err) {
         console.error("error fetching", err);
       }
@@ -110,58 +132,70 @@ const [currentInbox, setCurrentInbox] = useState<string | null>(null);
   const closeModal = () => setIsModalOpen(false);
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="">
+<div className="relative overflow-hidden flex  px-16 py-32 md:p-16 bg-white text-slate-800">
+        <div className="flex flex-col  mx-auto w-full">
+          <div>
+            <h1 className="scroll-m-20 text-2xl font-medium tracking-tight lg:text-4xl">
+             Welcome Back, {userName} !
+            </h1>
+          </div>
+          <div>
+            <p className="leading-7 [&:not(:first-child)]:mt-6 text-slate-500">
+            Comprehensive analysis of environmental readings, highlighting temperature, humidity, and air quality trends.
+            </p>
+          </div>
+        </div>
+      </div>
 
-
-
-<div className='grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-4 mt-4'>
+<div className='p-4 grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-4 mt-4'>
         <div>
-          <Card className='text-center text-blue-600 bg-blue-100'>
+          <Card className='text-center text-blue-600'>
             <CardHeader className='flex justify-center items-center'>
               <Image src={Reportsvg} alt='repo' width={60} height={60}/>
             </CardHeader>
-              <CardTitle className='text-4xl '>{reponum}
+              <CardTitle className='text-6xl '>{reponum}
               <p className='text-lg '>Reports</p>
-              <CardDescription className='font-light'>written</CardDescription>
+              <CardDescription className='font-medium'>written</CardDescription>
               </CardTitle>
             <CardContent>
             </CardContent>
           </Card>
         </div>
         <div>
-          <Card className='text-center text-yellow-600 bg-yellow-50'>
+          <Card className='text-center text-yellow-600 '>
             <CardHeader className='flex justify-center items-center'>
               <Image src={filesvg} alt='repo' width={60} height={60}/>
             </CardHeader>
-              <CardTitle className='text-4xl '>{filenum}
+              <CardTitle className='text-6xl '>{filenum}
               <p className='text-lg '>Files</p>
-              <CardDescription className='font-light'>uploaded</CardDescription>
+              <CardDescription className='font-medium'>uploaded</CardDescription>
               </CardTitle>
             <CardContent>
             </CardContent>
           </Card>
         </div>
         <div>
-          <Card className='text-center text-red-600 bg-red-50'>
+          <Card className='text-center text-red-600 '>
             <CardHeader className='flex justify-center items-center'>
               <Image src={eventsvg} alt='repo' width={60} height={60}/>
             </CardHeader>
-              <CardTitle className='text-4xl '>{eventnum}
+              <CardTitle className='text-6xl '>{eventnum}
               <p className='text-lg '>Events</p>
-              <CardDescription className='font-light'>pending</CardDescription>
+              <CardDescription className='font-medium'>pending</CardDescription>
               </CardTitle>
             <CardContent>
             </CardContent>
           </Card>
         </div>
         <div>
-          <Card className='text-center text-violet-600 bg-violet-100'>
+          <Card className='text-center text-violet-600 '>
             <CardHeader className='flex justify-center items-center'>
               <Image src={inboxsvg} alt='repo' width={60} height={60}/>
             </CardHeader>
-              <CardTitle className='text-4xl '>{reponum}
+              <CardTitle className='text-6xl '>{inboxnum}
               <p className='text-lg '>Inbox</p>
-              <CardDescription className='font-light'>received</CardDescription>
+              <CardDescription className='font-medium'>received</CardDescription>
               </CardTitle>
             <CardContent>
             </CardContent>

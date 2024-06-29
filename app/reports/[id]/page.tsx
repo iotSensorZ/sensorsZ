@@ -42,7 +42,7 @@ const ReportDetailPage = () => {
     if (report && report.url) {
       const link = document.createElement('a');
       link.href = report.url;
-      link.download = `${report.title}.docx`;
+      link.download = `${report.title}.pdf`;
       link.click();
     }
   };
@@ -56,16 +56,35 @@ const ReportDetailPage = () => {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">{report.title}</h1>
-      <p className="text-gray-600 mb-4">
-        {new Date(report.createdAt.seconds * 1000).toLocaleString()}
-      </p>
-      <Button onClick={handleDownload} className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md shadow-sm">
-        Download Report
-      </Button>
-    </div>
-  );
-};
-
+      <div className="container mx-auto p-2 flex flex-col h-screen">
+        {/* <div className="mb-4 flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold">{report.title}</h1>
+            <p className="text-gray-600">
+              {new Date(report.createdAt.seconds * 1000).toLocaleString()}
+            </p>
+          </div>
+          <Button onClick={handleDownload} className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md shadow-sm">
+            Download Report
+          </Button>
+        </div> */}
+        
+        <div className="flex-grow border rounded-md flex">
+         <object
+          data={report.url}
+          type="application/pdf"
+          width="100%"
+          height="100%"
+          className="border-0 flex-grow"
+          style={{ minHeight: '800px' }}
+        >
+          <p>
+            Your browser does not support PDFs. <a href={report.url}>Download the PDF</a>.
+          </p>
+        </object>
+        </div>
+      </div>
+    );
+  };
+  
 export default ReportDetailPage;

@@ -21,8 +21,9 @@ const Inbox: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentEmail, setCurrentEmail] = useState<string | null>(null);
+  // const [currentEmail, setCurrentEmail] = useState<string | null>(null);
   const [userEmails, setUserEmails] = useState<{ id: string, email: string }[]>([]);
+  const [currentEmail, setCurrentEmail] = useState<string | 'All'>('All');
 
   useEffect(() => {
     if (!currentUser) return;
@@ -58,12 +59,12 @@ const Inbox: React.FC = () => {
         // Combine both email sources
         const combinedEmails = Array.from(new Set([...emails, ...fetchedEmails]));
         const emailObjects = combinedEmails.map((email: string) => ({ id: email, email })); // Map to objects with id and email
-
+        setUserEmails([{ id: 'All', email: 'All' }, ...emailObjects]); 
         console.log("Emails:", emailObjects);
 
-        setUserEmails(emailObjects);
+        // setUserEmails(emailObjects);
         if (combinedEmails.length > 0) {
-          setCurrentEmail(combinedEmails[0]);
+          setCurrentEmail('All');
         }
       } catch (err) {
         console.error('Error fetching user emails:', err);
@@ -74,19 +75,31 @@ const Inbox: React.FC = () => {
   }, [currentUser]);
 
   useEffect(() => {
-    if (!currentUser || !currentEmail) return;
+    if (!currentUser) return;
 
     const fetchMessages = async () => {
       setLoading(true);
       try {
-        const messagesRef = collection(firestore, 'users', currentUser.uid, 'messages');
-        const q = query(messagesRef, where('receiverEmail', '==', currentEmail), orderBy('timestamp', 'desc'));
-        const querySnapshot = await getDocs(q);
+        let fetchedMessages: Message[] = [];
+        if (currentEmail === 'All') {
+          const messagesRef = collection(firestore, 'users', currentUser.uid, 'messages');
+          const q = query(messagesRef, orderBy('timestamp', 'desc'));
+          const querySnapshot = await getDocs(q);
 
-        const fetchedMessages: Message[] = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Message[];
+          fetchedMessages = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          })) as Message[];
+        } else {
+          const messagesRef = collection(firestore, 'users', currentUser.uid, 'messages');
+          const q = query(messagesRef, where('receiverEmail', '==', currentEmail), orderBy('timestamp', 'desc'));
+          const querySnapshot = await getDocs(q);
+
+          fetchedMessages = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          })) as Message[];
+        }
 
         console.log("Fetched messages:", fetchedMessages);
 
@@ -107,7 +120,11 @@ const Inbox: React.FC = () => {
   };
 
   if (loading) {
-    return <p className="flex justify-center"> <Loader2 className="animate-spin" /></p>
+    return (
+      <div className="flex justify-center items-center mt-4">
+        <div className="loader border-t-4 border-blue-500 border-solid rounded-full w-8 h-8 animate-spin"></div>
+      </div>
+    );
   }
 
   if (error) {

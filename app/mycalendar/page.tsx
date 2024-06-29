@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { saveAs } from 'file-saver';
 
 interface CustomEvent {
   id: string;
@@ -21,7 +22,7 @@ interface CustomEvent {
   end?: string;
   allDay: boolean;
   type: 'event' | 'meeting';
-  email: string; // New field to store the associated email
+  email: string; // to store the associated email
 }
 
 interface UserEmail {
@@ -192,8 +193,30 @@ const FullCalendarScheduler = () => {
 
   const filteredEvents = filter === 'all' ? events : events.filter(event => event.type === filter);
 
+
+  const downloadICSFile = () => {
+    const icsContent = convertToICS(filteredEvents);
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    saveAs(blob, 'calendar.ics');
+  };
+
+  const convertToICS = (events: CustomEvent[]) => {
+    let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\n';
+    events.forEach(event => {
+      const endDate = event.end ? formatDateToICS(event.end) : '';
+      icsContent += `BEGIN:VEVENT\nSUMMARY:${event.title}\nDTSTART:${formatDateToICS(event.start)}\n${endDate ? `DTEND:${endDate}\n` : ''}END:VEVENT\n`;
+    });
+    icsContent += 'END:VCALENDAR';
+    return icsContent;
+  };
+
+  const formatDateToICS = (date: string) => {
+    return new Date(date).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  };
+
+
   return (
-    <div>
+    <div className='p-4'>
       <div className="mb-4 text-right">
         <label htmlFor="emailSelect" className="mr-2">Select Email:</label>
         <select
@@ -220,6 +243,14 @@ const FullCalendarScheduler = () => {
           <option value="meeting">Meetings</option>
         </select>
       </div>
+
+      <div className="mb-4 text-right">
+        <Button variant='blue'
+          onClick={downloadICSFile}>
+          Download Calendar
+        </Button>
+      </div>
+
       <FullCalendar
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
         headerToolbar={{

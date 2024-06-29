@@ -1,45 +1,64 @@
-// components/StorageList.tsx
 "use client";
 import { useState, useEffect } from 'react';
 import { firestore, storage } from '@/firebase/firebase';
 import { useAuth } from '@/context/AuthContext';
 import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import { ref, getDownloadURL, deleteObject } from 'firebase/storage';
-import { Card, CardContent, CardTitle, CardDescription } from "@/components/card/page";
+import { Card, CardContent, CardTitle } from "@/components/card/page";
 import { FaTrash } from '@react-icons/all-files/fa/FaTrash';
+import { FaFolder } from '@react-icons/all-files/fa/FaFolder';
 import { FaEdit } from '@react-icons/all-files/fa/FaEdit';
 import { FaPlus } from '@react-icons/all-files/fa/FaPlus';
 import { Button } from "@/components/ui/button";
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import FolderModal from '../folderModel/page';
 
 const StorageList = () => {
   const [files, setFiles] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const { currentUser } = useAuth();
+  const [selectedFolder, setSelectedFolder] = useState<string>('');
+  const [folders, setFolders] = useState<string[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const router = useRouter();
+  const predefinedFolders = ['cards', 'personal', 'work', 'photos'];
+
+  useEffect(() => {
+    const fetchFolders = async () => {
+      if (!currentUser) return;
+      try {
+        const querySnapshot = await getDocs(collection(firestore, 'users', currentUser.uid, 'folders'));
+        const folderNames = querySnapshot.docs.map(doc => doc.id);
+        setFolders(folderNames);
+      } catch (err) {
+        toast.error('Error fetching folders');
+      }
+    };
+
+    fetchFolders();
+  }, [currentUser, isModalOpen]);
 
   useEffect(() => {
     const fetchFiles = async () => {
-      if (!currentUser) {
-        setError('User not logged in');
+      if (!currentUser || !selectedFolder) {
         setLoading(false);
         return;
       }
 
       try {
-        const querySnapshot = await getDocs(collection(firestore, 'users', currentUser.uid, 'files'));
+        const querySnapshot = await getDocs(collection(firestore, 'users', currentUser.uid, 'folders', selectedFolder, 'files'));
         const filesData = await Promise.all(
           querySnapshot.docs.map(async (doc) => {
             const fileData = doc.data();
-            const fileRef = ref(storage, `users/${currentUser.uid}/files/${fileData.name}`);
+            const fileRef = ref(storage, `users/${currentUser.uid}/folders/${selectedFolder}/files/${fileData.name}`);
             try {
               const downloadURL = await getDownloadURL(fileRef);
               return { ...fileData, id: doc.id, url: downloadURL };
             } catch (err) {
-              toast.error('Error getting download URL:');
+              toast.error('Error getting download URL');
               return null;
             }
           })
@@ -47,14 +66,14 @@ const StorageList = () => {
         setFiles(filesData.filter(file => file)); // Filter out null values
       } catch (err) {
         setError('Failed to fetch files');
-        toast.error('Error fetching files:');
+        toast.error('Error fetching files');
       } finally {
         setLoading(false);
       }
     };
 
     fetchFiles();
-  }, [currentUser]);
+  }, [currentUser, selectedFolder]);
 
   const handleDelete = async (id: string, name: string) => {
     if (!currentUser) {
@@ -62,24 +81,41 @@ const StorageList = () => {
       return;
     }
     try {
-      const fileRef = ref(storage, `users/${currentUser.uid}/files/${name}`);
+      const filePath = `users/${currentUser.uid}/folders/${selectedFolder}/files/${name}`;
+      const fileRef = ref(storage, filePath);
       await deleteObject(fileRef);
-      await deleteDoc(doc(firestore, 'users', currentUser.uid, 'files', name));
+      await deleteDoc(doc(firestore, 'users', currentUser.uid, 'folders', selectedFolder, 'files', name));
       setFiles(files.filter(file => file.id !== id));
       toast.success('File deleted successfully');
     } catch (err) {
       toast.error('Failed to delete file');
-      // setError('Failed to delete file');
       console.error('Error deleting file:', err);
     }
+  };
+
+  const handleFolderClick = (folderName: string) => {
+    setSelectedFolder(folderName); // Set the selected folder
+    router.push(`/storage/${folderName}`);
   };
 
   const handleEdit = (id: string) => {
     router.push(`/edit/${id}`);
   };
 
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
   if (loading) {
-    return <p className="flex justify-center"> <Loader2 className="animate-spin" /></p>
+    return (
+      <div className="flex justify-center items-center mt-4">
+        <div className="loader border-t-4 border-blue-500 border-solid rounded-full w-8 h-8 animate-spin"></div>
+      </div>
+    )
   }
 
   if (error) {
@@ -87,36 +123,39 @@ const StorageList = () => {
   }
 
   return (
-    <div className=" font-medium grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {files.map((file) => (
-        <Card key={file.name} className="bg-white shadow-md">
+    <div className="font-medium grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {predefinedFolders.map(folder => (
+        <Card key={folder} className="bg-white shadow-md cursor-pointer" onClick={() => handleFolderClick(folder)}>
           <CardContent>
             <div className="flex justify-between items-center">
               <div>
-                <CardTitle>{file.name}</CardTitle>
-                <CardDescription>
-                  <a href={file.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
-                    Download
-                  </a>
-                </CardDescription>
+                <CardTitle>{folder}</CardTitle>
               </div>
-              <div className="flex space-x-2">
-                <Button className="p-2" onClick={() => handleEdit(file.id)}>
-                  <FaEdit />
-                </Button>
-                <Button variant="destructive" className="p-2" onClick={() => handleDelete(file.id, file.name)}>
-                  <FaTrash />
-                </Button>
-              </div>
+              <FaFolder className="text-4xl text-gray-600" />
             </div>
           </CardContent>
         </Card>
       ))}
-      {/* <Card className="bg-white shadow-md flex items-center justify-center cursor-pointer" onClick={() => router.push('/storage')}>
+      {folders.map(folder => (
+        !predefinedFolders.includes(folder) && (
+          <Card key={folder} className="bg-white shadow-md cursor-pointer" onClick={() => handleFolderClick(folder)}>
+            <CardContent>
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle>{folder}</CardTitle>
+                </div>
+                <FaFolder className="text-4xl text-gray-600" />
+              </div>
+            </CardContent>
+          </Card>
+        )
+      ))}
+      <Card className="bg-white shadow-md flex items-center justify-center cursor-pointer" onClick={handleOpenModal}>
         <CardContent>
           <FaPlus className="text-4xl text-gray-600" />
         </CardContent>
-      </Card> */}
+      </Card>
+      <FolderModal open={isModalOpen} onClose={handleCloseModal} />
     </div>
   );
 };

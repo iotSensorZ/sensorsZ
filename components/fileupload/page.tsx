@@ -9,8 +9,13 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import { FaCloudUploadAlt } from "@react-icons/all-files/fa/FaCloudUploadAlt";
 
-const FileUpload = () => {
+interface FileUploadProps {
+  folder: string;
+  onUploadComplete: () => void; // Callback to trigger after successful upload
+}
+const FileUpload: React.FC<FileUploadProps> = ({ folder, onUploadComplete }) => {
   const router = useRouter();
   const { currentUser } = useAuth();
   const [file, setFile] = useState<File | null>(null);
@@ -28,28 +33,39 @@ const FileUpload = () => {
       return;
     }
 
-    const filePath = `users/${currentUser.uid}/files/${file.name}`;
+    const filePath = `users/${currentUser.uid}/folders/${folder}/files/${file.name}`;
     const fileRef = ref(storage, filePath);
 
     try {
       await uploadBytes(fileRef, file);
       const downloadURL = await getDownloadURL(fileRef);
-      await setDoc(doc(firestore, 'users', currentUser.uid, 'files', file.name), {
+      await setDoc(doc(firestore, 'users', currentUser.uid, 'folders', folder, 'files', file.name), {
         name: file.name,
         url: downloadURL,
         createdAt: new Date(),
       });
-    toast.success('File uploaded successfully');
-      router.push('/dashboard')
+      toast.success('File uploaded successfully');
+      onUploadComplete()
+      router.push(`/storage/${folder}`);
     } catch (error) {
-    toast.error('Failed to upload file');
+      toast.error('Failed to upload file');
       console.error('Error uploading file:', error);
     }
   };
 
   return (
-    <div className='m-5 text-center align-middle' >
-      <Input type="file" onChange={handleFileChange} />
+    <div className='m-5 text-center align-middle flex justify-end'>
+      <div className="flex gap-5 align-middle">
+     <label htmlFor="fileInput" className="cursor-pointer">
+        <FaCloudUploadAlt size={50} className="text-blue-500" />
+      </label>
+      <input
+        id="fileInput"
+        type="file"
+        onChange={handleFileChange}
+        style={{ }}
+        />
+        </div>
       <Button variant="blue" className='m-5' onClick={handleUpload}>Upload</Button>
       {error && <p className="text-red-600">{error}</p>}
     </div>

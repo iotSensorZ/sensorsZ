@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     const data = response.data;
     console.log("data",data)
     return NextResponse.json({ result: data });
-  } catch (error) {
+  } catch (error:any) {
     return NextResponse.json({ error: 'Failed to paraphrase text', details: error.message }, { status: 500 });
   }
 }

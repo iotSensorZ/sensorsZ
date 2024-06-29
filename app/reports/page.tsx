@@ -7,6 +7,10 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Switch } from '@headlessui/react';
 import { MagnifyingGlassIcon, ArrowUpIcon, ArrowDownIcon } from '@heroicons/react/24/outline';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+
 
 interface Report {
   id: string;
@@ -120,67 +124,140 @@ const ReportList = () => {
 
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Reports</h1>
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <input
-            type="text"
-            placeholder="Search reports..."
-            value={searchTerm}
-            onChange={handleSearch}
-            className="p-2 border border-gray-300 rounded"
-          />
-          <MagnifyingGlassIcon className="h-6 w-6 text-gray-500" />
-        </div>
-        <Button onClick={handleSort} className="flex items-center">
-          {sortAscending ? (
-            <ArrowUpIcon className="h-6 w-6 mr-2" />
-          ) : (
-            <ArrowDownIcon className="h-6 w-6 mr-2" />
-          )}
-          Sort by Date
-        </Button>
-        {currentUser && (
-            <Button onClick={handleShowMyReports}>
-              {showMyReports ? 'Show All Reports' : 'Show My Reports'}
-            </Button>
-          )}
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredReports.map((report) => (
-          <div key={report.id} className="p-4 border border-gray-300 rounded-2xl shadow bg-white">
-            <h2 className="text-xl font-bold mb-2">{report.title}</h2>
-            <p className="text-gray-600">
-              {report.createdAt?.seconds
-                ? new Date(report.createdAt.seconds * 1000).toLocaleString()
-                : 'No date available'}
+    <div className="">
+
+
+      <div
+        className="relative overflow-hidden flex  items-center justify-center px-16 py-32 md:p-20 bg-slate-800 text-white"
+      >
+        <div className="flex flex-col items-center justify-center  mx-auto w-full">
+          <div
+          // initial={{ opacity: 0 }}
+          // animate={{ opacity: 1, transition: { delay: 0 } }}
+          >
+            <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+              Our Topmost
+            </h3>
+          </div>
+          <div
+          // initial={{ opacity: 0 }}
+          // animate={{ opacity: 1, transition: { delay: 0 } }}
+          >
+            <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+              Performance Reports
+            </h1>
+          </div>
+          <div
+          // initial={{ opacity: 0 }}
+          // animate={{ opacity: 1, transition: { delay: 0.3 } }}
+          >
+            <p className="leading-7 [&:not(:first-child)]:mt-6">
+            Comprehensive analysis of environmental readings, highlighting temperature, humidity, and air quality trends.
             </p>
-            <Button variant="blue" className="mt-2" onClick={() => router.push(`/reports/${report.id}`)}>
-              View Report
+          </div>
+        </div>
+
+        <svg
+          className="absolute inset-0 pointer-events-none"
+          viewBox="0 0 960 540"
+          width="100%"
+          height="100%"
+          preserveAspectRatio="xMidYMax slice"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <g
+            className="text-gray-700 opacity-25"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="100"
+          >
+            <circle
+              r="234"
+              cx="196"
+              cy="23"
+            />
+            <circle
+              r="234"
+              cx="790"
+              cy="491"
+            />
+          </g>
+        </svg>
+      </div>
+
+      <div className='p-6'>
+
+        {/* <h1 className="text-2xl font-bold mb-4">Reports</h1> */}
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <MagnifyingGlassIcon className="h-6 w-6 text-gray-500" />
+            <input
+              type="text"
+              placeholder="Search reports..."
+              value={searchTerm}
+              onChange={handleSearch}
+              className="p-2 border border-gray-500 rounded bg-transparent"
+            />
+          </div>
+          <div className='flex gap-4'>
+            <Button onClick={handleSort} className="flex items-center">
+              {sortAscending ? (
+                <ArrowUpIcon className="h-6 w-6 mr-2" />
+              ) : (
+                <ArrowDownIcon className="h-6 w-6 mr-2" />
+              )}
+              Sort by Date
             </Button>
-            {currentUser && currentUser.uid === report.ownerId && (
-              <div className="flex items-center justify-between mt-4">
-                <span>Public:</span>
-                <Switch
-                  checked={report.isPublic}
-                  onChange={() => handleToggleVisibility(report.id, report.isPublic)}
-                  className={`${
-                    report.isPublic ? 'bg-blue-600' : 'bg-gray-200'
-                  } relative inline-flex h-6 w-11 items-center rounded-full`}
-                >
-                  <span className="sr-only">Toggle Visibility</span>
-                  <span
-                    className={`${
-                      report.isPublic ? 'translate-x-6' : 'translate-x-1'
-                    } inline-block h-4 w-4 transform bg-white rounded-full transition`}
-                  />
-                </Switch>
-              </div>
+            {currentUser && (
+              <Button onClick={handleShowMyReports}>
+                {showMyReports ? 'Show All Reports' : 'Show My Reports'}
+              </Button>
             )}
           </div>
-        ))}
+        </div>
+
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredReports.map((report) => (
+
+            <Card key={report.id} className="w-[350px]">
+              <CardHeader>
+                <CardTitle className='font-medium'>{report.title}</CardTitle>
+                <CardDescription>{report.createdAt?.seconds
+                  ? new Date(report.createdAt.seconds * 1000).toLocaleString()
+                  : 'No date available'}</CardDescription>
+              </CardHeader>
+              <CardContent>
+
+              </CardContent>
+              <CardFooter className=" mt-5 p-5 flex justify-between bg-slate-50 border-t border-[#4F46E5]">
+                {/* <Button variant="outline">Cancel</Button> */}
+                <Button variant='purple' className="mt-2" onClick={() => router.push(`/reports/${report.id}`)}>
+                  View Report
+                </Button>
+                {currentUser && currentUser.uid === report.ownerId && (
+                  <div className="flex items-center justify-between mt-4">
+                    <span>Public:</span>
+                    <Switch
+                      checked={report.isPublic}
+                      onChange={() => handleToggleVisibility(report.id, report.isPublic)}
+                      className={`${report.isPublic ? 'bg-[#4F46E5]' : 'bg-gray-200'
+                        } relative inline-flex h-6 w-11 items-center rounded-full`}
+                    >
+                      <span className="sr-only">Toggle Visibility</span>
+                      <span
+                        className={`${report.isPublic ? 'translate-x-6' : 'translate-x-1'
+                          } inline-block h-4 w-4 transform bg-white rounded-full transition`}
+                      />
+                    </Switch>
+                  </div>
+                )}
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
       </div>
+
     </div>
   );
 };
