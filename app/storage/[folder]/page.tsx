@@ -125,7 +125,7 @@ const FolderPage = () => {
                       Download
                     </a>
                 </Button>
-                <Button variant='destructive' className="mt-2" onClick={() => handleDelete(file.id, file.name)}>
+                <Button className="hover:bg-slate-600 mt-2" onClick={() => handleDelete(file.id, file.name)}>
                     <FaTrash />
                 </Button>
               </CardFooter>

@@ -48,7 +48,7 @@ const FolderModal: React.FC<FolderModalProps> = ({ open, onClose }) => {
         />
         <div className="flex justify-end">
           <Button variant="ghost" onClick={onClose} className="mr-2">Cancel</Button>
-          <Button variant="blue" onClick={handleCreateFolder}>Create</Button>
+          <Button variant="purple" className='rounded-lg' onClick={handleCreateFolder}>Create</Button>
         </div>
       </DialogContent>
     </Dialog>

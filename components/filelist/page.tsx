@@ -131,7 +131,7 @@ const StorageList = () => {
               <div>
                 <CardTitle>{folder}</CardTitle>
               </div>
-              <FaFolder className="text-4xl text-gray-600" />
+              <FaFolder className="text-4xl text-[#4F46E5] " />
             </div>
           </CardContent>
         </Card>
@@ -144,7 +144,7 @@ const StorageList = () => {
                 <div>
                   <CardTitle>{folder}</CardTitle>
                 </div>
-                <FaFolder className="text-4xl text-gray-600" />
+                <FaFolder className="text-4xl text-[#4F46E5] " />
               </div>
             </CardContent>
           </Card>
@@ -152,7 +152,7 @@ const StorageList = () => {
       ))}
       <Card className="bg-white shadow-md flex items-center justify-center cursor-pointer" onClick={handleOpenModal}>
         <CardContent>
-          <FaPlus className="text-4xl text-gray-600" />
+          <FaPlus className="text-4xl text-gray-600 " />
         </CardContent>
       </Card>
       <FolderModal open={isModalOpen} onClose={handleCloseModal} />

@@ -128,12 +128,12 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     <div className="flex h-screen bg-gray-100">
       <aside className={`bg-black text-slate-100 h-full flex flex-col transition-width duration-300 ${isSidebarOpen ? 'w-64' : 'w-24'} `}
       style={{overflow:"overlay",scrollbarWidth:"none"}}>
-        <div className="p-4 flex items-center justify-between">
-          <span className="font-bold text-xl mt-5">
+        <div className="p-4 flex" style={{justifyContent:"right"}}>
+          {/* <span className="font-medium text-xl mt-5 text-[#4F46E5]">
             <Link href='/dashboard'>
               {isSidebarOpen ? "Dashboard" : ("")} 
             </Link>
-          </span>
+          </span> */}
           <button onClick={handleToggleSidebar}>
           {(window.innerWidth < 588)?<Link href='/dashboard'><FaBars className='text-xl'/></Link>: <FaBars className='text-2xl' />}
            
@@ -146,6 +146,13 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
            <p className='font-medium text-sm text-white text-center'>{userName}</p>
           {userEmail}
           </li>) }
+          <li className='my-5'>
+          <span className="font-medium text-xl my-10 text-[#4F46E5]">
+            <Link href='/dashboard'>
+              {isSidebarOpen ? "Dashboard" : ("")} 
+            </Link>
+          </span>
+          </li>
           <li className={`p-4 mb-2 hover:bg-slate-800 hover:text-white hover:font-semibold hover:rounded-lg flex items-center ${isLinkActive('/dashboard')}`}>
           <Link href="/dashboard" className="flex items-center w-full" onClick={() => handleSidebarItemClick('/dashboard')}>
                   <FaHome className="mr-2" />

@@ -57,7 +57,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ folder, onUploadComplete }) => 
     <div className='m-5 text-center align-middle flex justify-end'>
       <div className="flex gap-5 align-middle">
      <label htmlFor="fileInput" className="cursor-pointer">
-        <FaCloudUploadAlt size={50} className="text-blue-500" />
+        <FaCloudUploadAlt size={50} className="text-[#4F46E5] " />
       </label>
       <input
         id="fileInput"
@@ -66,7 +66,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ folder, onUploadComplete }) => 
         style={{ }}
         />
         </div>
-      <Button variant="blue" className='m-5' onClick={handleUpload}>Upload</Button>
+      <Button variant="purple" className='rounded-lg m-5' onClick={handleUpload}>Upload</Button>
       {error && <p className="text-red-600">{error}</p>}
     </div>
   );
