@@ -21,6 +21,7 @@ import { FaCalendarAlt } from '@react-icons/all-files/fa/FaCalendarAlt';
 import { FaInbox } from "@react-icons/all-files/fa/FaInbox";
 import { FaTasks} from "@react-icons/all-files/fa/FaTasks";
 import { FaRocketchat } from "@react-icons/all-files/fa/FaRocketchat";
+import { FaUserAlt } from  "@react-icons/all-files/fa/FaUserAlt";
 import {  FaRegWindowRestore } from "@react-icons/all-files/fa/FaRegWindowRestore";
 import { FaFileSignature } from "@react-icons/all-files/fa/FaFileSignature";
 import EmailManagement from '../EmailManagement/page';
@@ -37,6 +38,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [activeLink, setActiveLink] = useState<string>('');
   const [showEmailCard, setShowEmailCard] = useState(false);
   const [userEmail, setuserEmail] = useState('')
+  const [userProfile, setuserProfile] = useState('')
 
 
   useEffect(() => {
@@ -49,6 +51,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           const userData = userDoc.data();
           setUserName(`${userData.firstName} ${userData.lastName}`);
           setuserEmail(userData.email);
+          setuserProfile(userData.profilePicUrl)
         }
       } else {
         setActiveLink('');
@@ -207,6 +210,12 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   {isSidebarOpen && "Tasks"}
               </Link>
             </li>
+            <li className={`p-4 mb-2 hover:bg-slate-800 hover:text-white hover:font-semibold hover:rounded-lg flex items-center ${isLinkActive('/myprofile')}`}>
+            <Link href="/myprofile"className="flex items-center w-full" onClick={() => handleSidebarItemClick('/myprofile')}>
+                  <FaUserAlt className="mr-2" />
+                  {isSidebarOpen && "My Profile"}
+              </Link>
+            </li>
           </ul>
         </nav>
         <div className="p-4">
@@ -236,12 +245,27 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <div className="text-lg font-medium text-slate-600">  {userName}</div>
           <div className="text-xs font-light text-slate-600">Admin</div>
             </div>
-            <Image
+
+
+
+            {userProfile ? (
+                    <img src={userProfile} alt="Profile" className=" h-12 w-12 rounded-full cursor-pointer" 
+                    onClick={handleAvatarClick}/>
+            ):(
+              <Image
               src={Avatar}
               alt="User Avatar"
               className="rounded-full h-10 w-10 cursor-pointer"
               onClick={handleAvatarClick}
             />
+            )}
+
+            {/* <Image
+              src={Avatar}
+              alt="User Avatar"
+              className="rounded-full h-10 w-10 cursor-pointer"
+              onClick={handleAvatarClick}
+            /> */}
           </div>
         </header>
         {showEmailCard && (
