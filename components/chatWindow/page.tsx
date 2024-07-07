@@ -6,10 +6,14 @@ import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
 import EmojiPicker,{ EmojiClickData }  from 'emoji-picker-react';
 import { FaRegSmile } from '@react-icons/all-files/fa/FaRegSmile';
+import Image from 'next/image';
+import Avatar from '@/public/images/avatar.jpg'
+
 interface User {
   id: string;
   firstName: string;
  lastName: string;
+ profilePicUrl:string;
 }
 
 interface Message {
@@ -84,8 +88,17 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentUser, selectedUser }) =>
     <div className=" text-gray-500 w-3/4 h-full flex flex-col">
      
      <div className="border-b border-slate-300 relative overflow-hidden flex  px-5 py-5 md:p-5 bg-slate-50 text-slate-800">
-        <div className="flex flex-col  mx-auto w-full">
-            <p className="text-slate-700 font-semibold">
+        <div className="flex gap-4 mx-auto w-full">
+        {selectedUser.profilePicUrl ? (
+   <img src={selectedUser.profilePicUrl} alt="Profile" className=" h-12 w-12 rounded-full cursor-pointer" />
+  ):(
+    <Image
+    src={Avatar}
+    alt="User Avatar"
+    className="rounded-full h-10 w-10 cursor-pointer"
+    />
+  )}
+            <p className="content-center  text-slate-700 font-semibold">
             {selectedUser.firstName} {selectedUser.lastName}
             </p>
         </div>

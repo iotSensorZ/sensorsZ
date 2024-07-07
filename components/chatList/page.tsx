@@ -3,12 +3,14 @@ import { auth, firestore } from '@/firebase/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-
+import Avatar from '@/public/images/avatar.jpg'
+import Image from 'next/image';
 interface User {
   id: string;
   firstName: string;
   lastName: string;
-  email:string
+  email:string;
+  profilePicUrl:string;
 }
 
 interface UserListProps {
@@ -57,8 +59,22 @@ return () => unsubscribe();
           className="pl-3 p-3  border-b cursor-pointer hover:bg-gray-200"
           onClick={() => setSelectedUser(user)}
         >
+<div className='flex gap-4'>
+ {user.profilePicUrl ? (
+   <img src={user.profilePicUrl} alt="Profile" className=" h-12 w-12 rounded-full cursor-pointer" />
+  ):(
+    <Image
+    src={Avatar}
+    alt="User Avatar"
+    className="rounded-full h-10 w-10 cursor-pointer"
+    />
+  )}
+  <div>
+
           <p>{user.firstName} {user.lastName}</p>
           <p>{user.email}</p>
+  </div>
+  </div>
         </div>
       ))}
     </div>
