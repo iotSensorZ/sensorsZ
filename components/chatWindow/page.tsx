@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, Timestamp } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, Timestamp, updateDoc, doc } from 'firebase/firestore';
 import { toast } from 'sonner';
 import { FaRocketchat } from "@react-icons/all-files/fa/FaRocketchat";
 import { Button } from '../ui/button';
@@ -7,13 +7,13 @@ import { Textarea } from '../ui/textarea';
 import EmojiPicker,{ EmojiClickData }  from 'emoji-picker-react';
 import { FaRegSmile } from '@react-icons/all-files/fa/FaRegSmile';
 import Image from 'next/image';
-import Avatar from '@/public/images/avatar.jpg'
+import Avatar from '@/public/images/avatar.jpg';
 
 interface User {
   id: string;
   firstName: string;
- lastName: string;
- profilePicUrl:string;
+  lastName: string;
+  profilePicUrl: string;
 }
 
 interface Message {
@@ -21,6 +21,7 @@ interface Message {
   receiverId: string;
   text: string;
   createdAt: Timestamp;
+  isRead: boolean;
 }
 
 interface ChatWindowProps {
@@ -31,14 +32,26 @@ interface ChatWindowProps {
 const ChatWindow: React.FC<ChatWindowProps> = ({ currentUser, selectedUser }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const [emoji, setemoji] = useState(false)
+  const [emoji, setEmoji] = useState(false);
   const emojiPickerRef = useRef<HTMLDivElement | null>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
+
 
   useEffect(() => {
     const db = getFirestore();
     const chatId = [currentUser.uid, selectedUser.id].sort().join('_');
     const q = query(collection(db, 'chats', chatId, 'messages'), orderBy('createdAt'));
     const unsubscribe = onSnapshot(q, snapshot => {
+      const unreadMessages = snapshot.docs.filter(doc => !doc.data().isRead && doc.data().receiverId === currentUser.uid);
+      unreadMessages.forEach(doc => {
+        updateDoc(doc.ref, { isRead: true });
+      });
       setMessages(snapshot.docs.map(doc => doc.data() as Message));
     });
 
@@ -55,6 +68,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentUser, selectedUser }) =>
         receiverId: selectedUser.id,
         text: newMessage,
         createdAt: Timestamp.now(),
+        isRead: false, // Add this field
       });
       setNewMessage('');
     } catch (error) {
@@ -63,69 +77,60 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentUser, selectedUser }) =>
     }
   };
 
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target as Node)) {
-        setemoji(false);
+        setEmoji(false);
       }
     };
-  
+
     document.addEventListener('mousedown', handleClickOutside);
-  
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-  
+
   const handleEmojiClick = (emojiData: EmojiClickData) => {
     setNewMessage((prevMessage) => prevMessage + emojiData.emoji);
-    setemoji(false);
+    setEmoji(false);
   };
 
-
   return (
-    <div className=" text-gray-500 w-3/4 h-full flex flex-col">
-     
-     <div className="border-b border-slate-300 relative overflow-hidden flex  px-5 py-5 md:p-5 bg-slate-50 text-slate-800">
+    <div className="text-gray-500 w-3/4 h-full flex flex-col">
+      <div className="border-b border-slate-300 relative flex px-5 py-5 md:p-5 bg-slate-50 text-slate-800">
         <div className="flex gap-4 mx-auto w-full">
-        {selectedUser.profilePicUrl ? (
-   <img src={selectedUser.profilePicUrl} alt="Profile" className=" h-12 w-12 rounded-full cursor-pointer" />
-  ):(
-    <Image
-    src={Avatar}
-    alt="User Avatar"
-    className="rounded-full h-10 w-10 cursor-pointer"
-    />
-  )}
-            <p className="content-center  text-slate-700 font-semibold">
+          {selectedUser.profilePicUrl ? (
+            <img src={selectedUser.profilePicUrl} alt="Profile" className="h-12 w-12 rounded-full cursor-pointer" />
+          ) : (
+            <Image src={Avatar} alt="User Avatar" className="rounded-full h-10 w-10 cursor-pointer" />
+          )}
+          <p className="content-center text-slate-700 font-semibold">
             {selectedUser.firstName} {selectedUser.lastName}
-            </p>
+          </p>
         </div>
       </div>
 
-      <div className="flex-grow p-4 overflow-y-auto ">
+      <div className="flex-grow p-4 overflow-y-auto mb-28" ref={chatContainerRef} style={{ scrollbarWidth: "none" }}>
         {messages.map((msg, index) => (
           <div key={index} className={`mb-2 ${msg.senderId === currentUser.uid ? 'text-right' : 'text-left'}`}>
             <div className={`inline-block p-2 rounded ${msg.senderId === currentUser.uid ? 'bg-[#4F46E5] text-white' : 'bg-slate-700 text-white'}`}>
               {msg.text}
             </div>
             <div className="text-xs text-gray-500 mt-1">
-        {new Date(msg.createdAt.seconds * 1000).toLocaleString()}
-      </div>
+              {new Date(msg.createdAt.seconds * 1000).toLocaleString()}
+            </div>
           </div>
         ))}
-        
       </div>
 
       {emoji && (
-        <div ref={emojiPickerRef} className="z-50 " style={{    width: 'fit-content'}}>
-      <EmojiPicker onEmojiClick={handleEmojiClick} />
-    </div>
-  )}
-      <div style={{    width:' -webkit-fill-available'}}
-       className="fixed bottom-0 p-2 overflow-hidden bg-gray-200 flex items-center gap-5">
-  <button onClick={()=>setemoji(!emoji)}><FaRegSmile/></button>
+        <div ref={emojiPickerRef} className="z-50" style={{ width: 'fit-content' }}>
+          <EmojiPicker onEmojiClick={handleEmojiClick} />
+        </div>
+      )}
+      <div style={{ width: '-webkit-fill-available' }} className="fixed bottom-0 p-2 overflow-hidden bg-gray-200 flex items-center gap-5">
+        <button onClick={() => setEmoji(!emoji)}><FaRegSmile /></button>
         <textarea
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
@@ -137,8 +142,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentUser, selectedUser }) =>
           Send
         </Button>
       </div>
-
-
     </div>
   );
 };
