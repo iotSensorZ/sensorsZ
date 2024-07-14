@@ -22,7 +22,7 @@ const TaskColumn: React.FC<TaskColumnProps> = ({ tasks, setTasks }) => {
       <div className='bg-white my-5 rounded-lg p-4'>
         <SortableContext items={tasks.map(task => task.id)} strategy={verticalListSortingStrategy}>
           {tasks.map((task) => (
-            <div className=''>
+            <div className='' key={task.id}>
             <TaskList key={task.id} id={task.id} title={task.title} done={task.done} setTasks={setTasks}
              />
              </div>

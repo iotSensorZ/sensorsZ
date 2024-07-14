@@ -20,6 +20,7 @@ import { FaRegBell } from '@react-icons/all-files/fa/FaRegBell';
 import { FaCalendarAlt } from '@react-icons/all-files/fa/FaCalendarAlt';
 import { FaInbox } from "@react-icons/all-files/fa/FaInbox";
 import { FaTasks} from "@react-icons/all-files/fa/FaTasks";
+import { FaPhone} from "@react-icons/all-files/fa/FaPhone";
 import { FaRocketchat } from "@react-icons/all-files/fa/FaRocketchat";
 import { FaUserAlt } from  "@react-icons/all-files/fa/FaUserAlt";
 import {  FaRegWindowRestore } from "@react-icons/all-files/fa/FaRegWindowRestore";
@@ -196,6 +197,12 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <Link href="/messanger"className="flex items-center w-full" onClick={() => handleSidebarItemClick('/messanger')}>
                   <FaRocketchat className="mr-2" />
                   {isSidebarOpen && "Messanger"}
+              </Link>
+            </li>
+            <li className={`p-4 mb-2  hover:bg-slate-800 hover:text-white hover:font-semibold hover:rounded-lg flex items-center ${isLinkActive('/contacts')}`}>
+            <Link href="/contacts"className="flex items-center w-full" onClick={() => handleSidebarItemClick('/contacts')}>
+                  <FaPhone className="mr-2" />
+                  {isSidebarOpen && "Contacts"}
               </Link>
             </li>
             <li className={`p-4 mb-2 hover:bg-slate-800 hover:text-white hover:font-semibold hover:rounded-lg flex items-center ${isLinkActive('/notes')}`}>
