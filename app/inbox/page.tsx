@@ -1,20 +1,20 @@
 'use client'
-import Chat from '@/components/Chat/page'
-import EmailManagement from '@/components/EmailManagement/page'
-import Inbox from '@/components/Inbox/page'
-import InboxSwitcher from '@/components/InboxSwitcher/page'
-import React, { useState } from 'react'
+import React from 'react';
+import { useSearchParams } from 'next/navigation';
+import InboxList from '@/components/inboxList/page';
+import InboxWindow from '@/components/inboxWindow/page';
+import MessageDetail from './[messageId]/page';
 
-const page = () => {
-const [currentInbox, setCurrentInbox] = useState<string | null>(null);
+const Inbox: React.FC = () => {
+  const searchParams = useSearchParams();
+  const messageId = searchParams.get('messageId');
+
   return (
-    <div>
-           {/* <EmailManagement/> */}
-     {/* <InboxSwitcher onSelectInbox={setCurrentInbox}/> */}
-     {/* {currentInbox && <Chat currentInbox={currentInbox}/>} */}
-        <Inbox/>
+    <div className="flex h-screen overflow-hidden">
+      <InboxList />
+      {messageId ? <MessageDetail messageId={messageId} /> : <InboxWindow />}
     </div>
-  )
-}
+  );
+};
 
-export default page
+export default Inbox;
