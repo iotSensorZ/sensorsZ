@@ -147,7 +147,7 @@ const InboxWindow: React.FC = () => {
               <Link href={`/inbox?messageId=${message.id}`} className="contents">
                 <div className='flex items-center col-span-2'>
                   <MailOpen className='w-5 h-5' style={{ color: "gray" }} />
-                  <p className="ml-3 text-sm text-gray-500">{message.senderEmail}</p>
+                  <p className="ml-3 text-sm font-semibold text-gray-800">{message.senderEmail}</p>
                 </div>
                 <div className='col-span-2 flex items-center'>
                   <p className="text-slate-600">{message.subject}</p>

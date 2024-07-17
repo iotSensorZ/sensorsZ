@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import { DndContext, KeyboardSensor, MouseSensor, PointerSensor, TouchSensor, closestCorners, useSensor, useSensors } from '@dnd-kit/core';
 import { FaTasks } from '@react-icons/all-files/fa/FaTasks';
 import { Button } from '../ui/button';
+import { useAuth } from '@/context/AuthContext';
 
 interface Task {
   id: string;
@@ -22,11 +23,16 @@ interface TaskListProps {
 }
 
 const TaskList: React.FC<TaskListProps> = ({ id, title, done, setTasks }) => {
+  const { currentUser } = useAuth();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const [isEditing, setIsEditing] = useState(false);
   const [newTitle, setNewTitle] = useState(title);
   const [isDone, setIsDone] = useState(done);
-
+  const preAddedTasks = [
+    { title: 'Task 1', content: 'This is the content of note 1',  userId: '' },
+    { title: 'Task 2', content: 'This is the content of note 2',  userId: '' },
+    { title: 'Task 3', content: 'This is the content of note 3',  userId: '' }
+  ];
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -34,7 +40,8 @@ const TaskList: React.FC<TaskListProps> = ({ id, title, done, setTasks }) => {
   };
 
   const handleUpdate = async () => {
-    const taskDoc = doc(firestore, 'tasks', id);
+    if (!currentUser?.uid) return; 
+    const taskDoc = doc(firestore, 'users', currentUser.uid, 'tasks', id);
     try {
       await updateDoc(taskDoc, { title: newTitle });
       setTasks(tasks => tasks.map(task => (task.id === id ? { ...task, title: newTitle } : task)));
@@ -46,8 +53,10 @@ const TaskList: React.FC<TaskListProps> = ({ id, title, done, setTasks }) => {
   };
 
   const handleDelete = async (e: React.MouseEvent) => {
+    if (!currentUser?.uid) return; // Ensure currentUser.uid is defined
+
     e.stopPropagation(); // Prevent drag event from being triggered
-    const taskDoc = doc(firestore, 'tasks', id);
+    const taskDoc = doc(firestore, 'users', currentUser.uid, 'tasks', id);
     try {
       await deleteDoc(taskDoc);
       setTasks(tasks => tasks.filter(task => task.id !== id));
@@ -58,10 +67,11 @@ const TaskList: React.FC<TaskListProps> = ({ id, title, done, setTasks }) => {
   };
 
   const toggleDone = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!currentUser?.uid) return; // Ensure currentUser.uid is defined
     e.stopPropagation(); // Prevent drag event from being triggered
     const updatedDone = !isDone;
     setIsDone(updatedDone);
-    const taskDoc = doc(firestore, 'tasks', id);
+    const taskDoc = doc(firestore, 'users', currentUser.uid, 'tasks', id);
     try {
       await updateDoc(taskDoc, { done: updatedDone });
       setTasks(tasks => tasks.map(task => (task.id === id ? { ...task, done: updatedDone } : task)));
@@ -70,7 +80,6 @@ const TaskList: React.FC<TaskListProps> = ({ id, title, done, setTasks }) => {
       console.error('Error updating task: ', error);
     }
   };
-
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
@@ -99,15 +108,10 @@ const TaskList: React.FC<TaskListProps> = ({ id, title, done, setTasks }) => {
   );
 
   return (
-    <>
-<div className='flex bg-slate-100 p-2 my-2'>
-
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className='p-4 flex items-center justify-between border-b border-gray-300'>
-      {/* <DndContext sensors={sensors} onDragEnd={handleDragEnd} collisionDetection={closestCorners}> */}
-      <FaTasks/>
-      {/* </DndContext> */}
-    </div>
-     
+    <div className='flex bg-slate-100 p-2 my-2'>
+      <div ref={setNodeRef} style={style} {...attributes} {...listeners} className='p-4 flex items-center justify-between border-b border-gray-300'>
+        <FaTasks/>
+      </div>
       <input 
         type="checkbox"
         checked={isDone}
@@ -127,10 +131,8 @@ const TaskList: React.FC<TaskListProps> = ({ id, title, done, setTasks }) => {
           {title}
         </span>
       )}
-      <Button variant='purple' onClick={handleDelete} className="mr-10 ">Delete</Button>
-</div>
-    
-    </>
+      <Button variant='purple' onClick={handleDelete} className="mr-10">Delete</Button>
+    </div>
   );
 };
 

@@ -11,7 +11,11 @@ interface Note {
   content: string;
   labels: string[];
 }
-
+const preAddedNotes = [
+  { title: 'Note 1', content: 'This is the content of note 1', labels: ['Work'], userId: '' },
+  { title: 'Note 2', content: 'This is the content of note 2', labels: ['Personal'], userId: '' },
+  { title: 'Note 3', content: 'This is the content of note 3', labels: ['Ideas'], userId: '' }
+];
 const premadeLabels = ['Work', 'Personal', 'Urgent', 'Miscellaneous'];
 
 const NotesPage: React.FC = () => {
@@ -24,27 +28,28 @@ const NotesPage: React.FC = () => {
   const [dialogIsOpen, setDialogIsOpen] = useState(false);
   const [createDialogIsOpen, setCreateDialogIsOpen] = useState(false);
   const [sortAscending, setSortAscending] = useState(true);
-  
+
   useEffect(() => {
     const fetchNotes = async () => {
+      if (!currentUser?.uid) return; 
       const db = getFirestore();
-      const notesCollection = collection(db, 'notes');
+      const notesCollection = collection(db, 'users', currentUser.uid, 'notes');
       const notesSnapshot = await getDocs(notesCollection);
       const notesList = notesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Note));
       setNotes(notesList);
     };
 
     fetchNotes();
-  }, []);
+  }, [currentUser]);
 
   const handleAddNote = async () => {
     if (!title.trim() || !content.trim()) return;
-
+if(!currentUser)return;
     const db = getFirestore();
     const note = { title, content, labels: selectedLabels, userId: currentUser?.uid };
 
     try {
-      const docRef = await addDoc(collection(db, 'notes'), note);
+      const docRef = await addDoc(collection(db,'users',currentUser.uid, 'notes'), note);
       setNotes([...notes, { id: docRef.id, ...note }]);
       setTitle('');
       setContent('');
@@ -57,8 +62,9 @@ const NotesPage: React.FC = () => {
 
   const handleUpdateNote = async () => {
     if (selectedNote) {
+      if (!currentUser?.uid) return;
       const db = getFirestore();
-      const noteDoc = doc(db, 'notes', selectedNote.id);
+      const noteDoc = doc(db,'users',currentUser?.uid, 'notes', selectedNote.id);
       try {
         await updateDoc(noteDoc, {
           title: selectedNote.title,
@@ -75,8 +81,9 @@ const NotesPage: React.FC = () => {
 
   const handleDeleteNote = async () => {
     if (selectedNote) {
+      if (!currentUser?.uid) return;
       const db = getFirestore();
-      const noteDoc = doc(db, 'notes', selectedNote.id);
+      const noteDoc = doc(db,'users',currentUser?.uid, 'notes', selectedNote.id);
       try {
         await deleteDoc(noteDoc);
         setNotes(notes.filter(note => note.id !== selectedNote.id));
@@ -131,7 +138,7 @@ const NotesPage: React.FC = () => {
 <div className='bg-slate-100 p-4 rounded-lg'> 
 
       <div className="mb-4 p-4 align-middle justify-center text-center">
-        <Button variant='outline' className='rounded-lg w-2/3 text-slate-500 font-light hover:text-slate-400 hover:bg-white' onClick={() => setCreateDialogIsOpen(true)}>Take a note...</Button>
+        <Button variant='outline' className='rounded-lg w-2/3 border-[#4F46E5] border-2 text-slate-500 font-light hover:text-slate-400 hover:bg-white' onClick={() => setCreateDialogIsOpen(true)}>Take a note...</Button>
       </div>
       <div className="flex flex-wrap justify-center font-light">
         {notes.map(note => (
