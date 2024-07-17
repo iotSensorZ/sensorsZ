@@ -139,7 +139,7 @@ const Dashboard = () => {
       <div className="relative overflow-hidden flex px-16 py-32 md:p-16 bg-white text-slate-800">
         <div className="flex flex-col mx-auto w-full">
           <div>
-            <h1 className="scroll-m-20 text-2xl font-medium tracking-tight lg:text-4xl">
+            <h1 className="scroll-m-20 text-2xl font-bold tracking-tight lg:text-4xl">
               Welcome Back, {userName} !
             </h1>
           </div>
@@ -153,7 +153,7 @@ const Dashboard = () => {
 
       <div className='p-4 grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-4 mt-4'>
         <div>
-          <Card className='text-center text-blue-600'>
+          <Card className='text-center text-blue-600'><Grip className='' />
             <CardHeader className='flex justify-center items-center'>
               <Image src={Reportsvg} alt='repo' width={60} height={60} />
             </CardHeader>
@@ -166,7 +166,7 @@ const Dashboard = () => {
           </Card>
         </div>
         <div>
-          <Card className='text-center text-yellow-600 '>
+          <Card className='text-center text-yellow-600 '><Grip className='' />
             <CardHeader className='flex justify-center items-center'>
               <Image src={filesvg} alt='repo' width={60} height={60} />
             </CardHeader>
@@ -179,7 +179,7 @@ const Dashboard = () => {
           </Card>
         </div>
         <div>
-          <Card className='text-center text-red-600 '>
+          <Card className='text-center text-red-600 '><Grip className='' />
             <CardHeader className='flex justify-center items-center'>
               <Image src={eventsvg} alt='repo' width={60} height={60} />
             </CardHeader>
@@ -192,7 +192,7 @@ const Dashboard = () => {
           </Card>
         </div>
         <div>
-          <Card className='text-center text-violet-600 '>
+          <Card className='text-center text-violet-600 '><Grip className='' />
             <CardHeader className='flex justify-center items-center'>
               <Image src={inboxsvg} alt='repo' width={60} height={60} />
             </CardHeader>
@@ -206,7 +206,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 mt-14'>
+      <div className='m-5 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 mt-14'>
         <div>
           <Card className=''>
             <CardDescription className='text-center mt-2'><Grip className='mx-4' />recent reports</CardDescription>

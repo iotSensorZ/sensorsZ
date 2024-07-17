@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { firestore } from '@/firebase/firebase';
 import { collection, addDoc, getDocs } from 'firebase/firestore';
 import { toast } from 'react-toastify';
+import { useAuth } from '@/context/AuthContext';
 
 interface Task {
   id: string;
@@ -18,10 +19,11 @@ interface Task {
 const Tasks: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState<string>('');
-
+  const { currentUser } = useAuth();
   useEffect(() => {
     const fetchTasks = async () => {
-      const tasksCollection = collection(firestore, 'tasks');
+      if (!currentUser?.uid) return; 
+      const tasksCollection = collection(firestore, 'users',currentUser?.uid, 'tasks');
       const tasksSnapshot = await getDocs(tasksCollection);
       const tasksList = tasksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Task));
       setTasks(tasksList);
@@ -61,7 +63,8 @@ const Tasks: React.FC = () => {
     const newTask: Omit<Task, 'id'> = { title: newTaskTitle, done: false };
 
     try {
-      const docRef = await addDoc(collection(firestore, 'tasks'), newTask);
+      if (!currentUser?.uid) return; 
+      const docRef = await addDoc(collection(firestore,'users',currentUser.uid, 'tasks'), newTask);
       setTasks([...tasks, { id: docRef.id, ...newTask }]);
       setNewTaskTitle('');
     } catch (error) {

@@ -5,6 +5,7 @@ import { firestore } from "@/firebase/firebase";
 import { collection, writeBatch, doc, getDocs, updateDoc, deleteDoc, DocumentReference, getDoc } from "firebase/firestore";
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
+import { FaRegSmile } from "@react-icons/all-files/fa/FaRegSmile";
 
 interface Contact {
   id?: string; // Include the document ID for editing and deleting
@@ -187,7 +188,8 @@ const Contacts: React.FC = () => {
                 </div>
               ) : (
                 <>
-                  <div>
+                  <div className='flex gap-5'>
+                  <FaRegSmile/>
                     {contact.Name} 
                     {contact.Email?' - ' + contact.Email:''}
                     {contact.Phone? ' - '+contact.Phone:''}
