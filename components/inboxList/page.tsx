@@ -1,8 +1,8 @@
-import { Link } from 'lucide-react';
 import React, { useState } from 'react';
 import EmailManagement from '../EmailManagement/page';
 import EmailModal from '../SendEmail/page';
 import { FaMailBulk } from '@react-icons/all-files/fa/FaMailBulk';
+import Link from 'next/link';
 
 const InboxList: React.FC = () => {
   const [showEmailCard, setShowEmailCard] = useState(false);
@@ -31,8 +31,13 @@ const InboxList: React.FC = () => {
 
       <p className="text-[#4F46E5] p-2 font-semibold">MAILBOXES</p>
       <ul className="text-slate-600 p-2">  
-        <li className="p-2 m-1 rounded-md hover:text-black hover:bg-slate-100 cursor-pointer">Inbox</li>
+        <li className="p-2 m-1 rounded-md hover:text-black hover:bg-slate-100 cursor-pointer">
+          <Link href='/inbox'>
+          Inbox
+          </Link>
+          </li>
         <li className="p-2 m-1 rounded-md hover:text-black hover:bg-slate-100 cursor-pointer">Sent</li>
+        <li className="p-2 m-1 rounded-md hover:text-black hover:bg-slate-100 cursor-pointer">Starred</li>
         <li className="p-2 m-1 rounded-md hover:text-black hover:bg-slate-100 cursor-pointer">Drafts</li>
         <li className="p-2 m-1 rounded-md hover:text-black hover:bg-slate-100 cursor-pointer">Spam</li>
         <li className="p-2 m-1 rounded-md hover:text-black hover:bg-slate-100 cursor-pointer">Trash</li>

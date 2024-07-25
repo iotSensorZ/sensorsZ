@@ -16,7 +16,7 @@ interface User {
 
 interface UserWithTimestamp extends User {
   latestTimestamp: number;
-  unreadCount: number; // Add this field
+  unreadCount: number; 
 }
 
 interface UserListProps {
@@ -125,13 +125,13 @@ const UserList: React.FC<UserListProps> = ({ users, setSelectedUser }) => {
                 />
               )}
               <div>
-                <p className='flex justify-between'>{user.firstName} {user.lastName}
+                <div className='flex justify-between'>{user.firstName} {user.lastName}
                 {user.unreadCount > 0 && (
               <div className="bg-purple-800 text-white rounded-full h-6 w-6 flex justify-center">
                 {user.unreadCount}
               </div>
             )}
-                </p>
+                </div>
                 <p>{user.email}</p>
               </div>
             </div>

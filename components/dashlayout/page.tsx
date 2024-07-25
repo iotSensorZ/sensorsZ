@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth, firestore } from "@/firebase/firebase";
 import type { User } from 'firebase/auth';
-import { doc, getDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, onSnapshot, query, where } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { FaHome } from '@react-icons/all-files/fa/FaHome';
 import { FaFileAlt } from '@react-icons/all-files/fa/FaFileAlt';
@@ -40,7 +40,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [showEmailCard, setShowEmailCard] = useState(false);
   const [userEmail, setuserEmail] = useState('')
   const [userProfile, setuserProfile] = useState('')
-
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -54,16 +54,38 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           setuserEmail(userData.email);
           setuserProfile(userData.profilePicUrl)
         }
+           // Subscribe to unread message count in real-time
+          const subscribeToUnreadCount = () => {
+            let totalUnreadCount = 0;
+            const usersCollection = collection(firestore, 'users');
+
+            const usersSnapshot = getDocs(usersCollection).then(snapshot => {
+              snapshot.docs.forEach(doc => {
+                const chatId = [user.uid, doc.id].sort().join('_');
+                const unreadQuery = query(
+                  collection(firestore, 'chats', chatId, 'messages'),
+                  where('isRead', '==', false),
+                  where('receiverId', '==', user.uid)
+                );
+
+                onSnapshot(unreadQuery, (snapshot) => {
+                  totalUnreadCount += snapshot.size;
+                  setUnreadCount(totalUnreadCount);
+                });
+              });
+            });
+          };
+
+          subscribeToUnreadCount();
+          
       } else {
         setActiveLink('');
         router.push("/login");
       }
       setLoading(false);
     });
-
-    // Cleanup subscription
     return () => unsubscribe();
-  }, [router]);
+  }, [router,user]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -74,16 +96,15 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       }
     };
 
-    // Initialize the sidebar state based on current window size
     handleResize();
 
-    // Add event listener for window resize
     window.addEventListener('resize', handleResize);
 
-    // Cleanup event listener on component unmount
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+
+  
   const handleToggleSidebar = () => {
     if (window.innerWidth >= 588) {
       setIsSidebarOpen(!isSidebarOpen);
@@ -110,6 +131,10 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       </div>
     )
   }
+
+  const resetUnreadCount = () => {
+    setUnreadCount(0);
+  };
 
   const handleSidebarItemClick = (href: string) => {
     setActiveLink(href);
@@ -150,6 +175,19 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
            <p className='font-medium text-sm text-white text-center'>{userName}</p>
           {userEmail}
           </li>) }
+          <li className={`p-4 mb-2 justify-center flex items-center`}>
+          {userProfile ? (
+                    <img src={userProfile} alt="Profile" className=" h-12 w-12 rounded-full cursor-pointer" 
+                    onClick={handleAvatarClick}/>
+            ):(
+              <Image
+              src={Avatar}
+              alt="User Avatar"
+              className="rounded-full h-10 w-10 cursor-pointer"
+              onClick={handleAvatarClick}
+            />
+            )}
+            </li>
           <li className='my-5'>
           <span className="font-medium text-xl my-10 text-[#4F46E5]">
             <Link href='/dashboard'>
@@ -239,15 +277,34 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <div className="flex-1 flex flex-col">
         <header className="bg-white shadow p-4 flex justify-between items-center z-50">
           {/* <div className="text-lg font-medium text-slate-600">Welcome, {userName}</div> */}
-          <div className="flex items-center gap-6 text-xl text-slate-500">
+          <div className="flex items-center gap-2 text-xl text-slate-500">
+          <Link href='/' className='p-2 hover:bg-slate-200'>
           <FaHome/>
+          </Link>
+          <Link href='/storage' className='p-2 hover:bg-slate-200'>
           <FaUsers/>
+          </Link>
+          <Link href='/mycalendar' className='p-2 hover:bg-slate-200'>
           <FaCalendarAlt/>
+          </Link>
+          <Link href='/writereport' className='p-2 hover:bg-slate-200'>
           <FaFileSignature/>
+          </Link>
+          <Link href='/reports' className='p-2 hover:bg-slate-200'>
           <FaFileAlt/>
+          </Link>
             </div>
           <div className="flex justify-end items-center gap-4">
-            <div className='text-xl text-slate-500'><FaRegBell/></div>
+          <Link href='/messanger' className='p-2 hover:bg-slate-200'>
+          <div 
+            className='p-2 hover:bg-slate-200 flex text-xl' 
+            onClick={resetUnreadCount}
+          >
+          <FaRegBell/>         
+               {unreadCount>0 ? <div className="bg-yellow-500 text-white rounded-full h-3 w-3 flex align-center text-center justify-center"></div>
+                :''}
+          </div>
+          </Link>
             <div>
           <div className="text-lg font-medium text-slate-600">  {userName}</div>
           <div className="text-xs font-light text-slate-600">Admin</div>

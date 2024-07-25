@@ -4,7 +4,7 @@ import { collection, query, where, getDocs, orderBy, doc, getDoc } from 'firebas
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { MailOpen } from 'lucide-react';
+import { Inbox, Star } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -15,6 +15,7 @@ interface Message {
   subject: string;
   message: string;
   timestamp: any;
+  isStarred: boolean;
 }
 
 const InboxWindow: React.FC = () => {
@@ -78,11 +79,12 @@ const InboxWindow: React.FC = () => {
         const q = currentEmail === 'All'
           ? query(messagesRef, orderBy('timestamp', 'desc'))
           : query(messagesRef, where('receiverEmail', '==', currentEmail), orderBy('timestamp', 'desc'));
-        
+
         const querySnapshot = await getDocs(q);
         fetchedMessages = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
+          isStarred: false, 
         })) as Message[];
 
         setMessages(fetchedMessages);
@@ -103,6 +105,10 @@ const InboxWindow: React.FC = () => {
 
   const handleMessageClick = (messageId: string) => {
     router.push(`/inbox?messageId=${messageId}`);
+  };
+
+  const handleStarClick = (messageId: string) => {
+    setMessages(messages => messages.map(msg => msg.id === messageId ? { ...msg, isStarred: !msg.isStarred } : msg));
   };
 
   if (loading) {
@@ -144,11 +150,15 @@ const InboxWindow: React.FC = () => {
               key={message.id}
               className="grid grid-cols-5 gap-4 p-3 hover:bg-slate-100 rounded cursor-pointer"
             >
+              <div className='flex items-center col-span-2'>
+                <Star
+                  className='w-5 h-5'
+                  style={{ color: "gray", fill: message.isStarred ? 'gold' : 'white' }}
+                  onClick={() => handleStarClick(message.id)}
+                />
+                <p className="ml-3 text-sm font-semibold text-gray-800">{message.senderEmail}</p>
+              </div>
               <Link href={`/inbox?messageId=${message.id}`} className="contents">
-                <div className='flex items-center col-span-2'>
-                  <MailOpen className='w-5 h-5' style={{ color: "gray" }} />
-                  <p className="ml-3 text-sm font-semibold text-gray-800">{message.senderEmail}</p>
-                </div>
                 <div className='col-span-2 flex items-center'>
                   <p className="text-slate-600">{message.subject}</p>
                 </div>
@@ -161,7 +171,12 @@ const InboxWindow: React.FC = () => {
             </li>
           ))}
         </ul>
-        {messages.length === 0 && <p>Your Inbox is Empty!</p>}
+        {messages.length === 0 &&
+          <div className='mt-28 flex justify-center'>
+            <Inbox className='w-10 h-10 text-slate-500' />
+            <p className='text-3xl text-slate-500'>Your Inbox is Empty!!!</p>
+          </div>
+        }
       </div>
     </div>
   );
