@@ -34,6 +34,7 @@ const Contacts: React.FC = () => {
     const contactsSnapshot = await getDocs(userContactsCollection);
 
     const fetchedContacts: Contact[] = contactsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Contact[];
+    fetchedContacts.sort((a, b) => a.Name.localeCompare(b.Name));
     setContacts(fetchedContacts);
   };
 

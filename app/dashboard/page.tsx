@@ -19,6 +19,7 @@ import eventsvg from '@/public/images/events.svg';
 import filesvg from '@/public/images/files.svg';
 import inboxsvg from '@/public/images/inbox.svg';
 import { Grip } from 'lucide-react';
+import Avatar from '@/public/images/avatar.jpg'
 
 const Dashboard = () => {
   const [reports, setReports] = useState<any[]>([]);
@@ -35,6 +36,7 @@ const Dashboard = () => {
   const [currentInbox, setCurrentInbox] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [userProfile, setuserProfile] = useState('')
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -45,6 +47,7 @@ const Dashboard = () => {
         if (userDoc.exists()) {
           const userData = userDoc.data();
           setUserName(`${userData.firstName} ${userData.lastName}`);
+          setuserProfile(userData.profilePicUrl)
         }
       } else {
         setCurrentUserId(null);
@@ -137,16 +140,26 @@ const Dashboard = () => {
   return (
     <div className="">
       <div className="relative overflow-hidden flex px-16 py-32 md:p-16 bg-white text-slate-800">
-        <div className="flex flex-col mx-auto w-full">
-          <div>
+        <div className="flex flex-row gap-4 mx-auto w-full">
+          {userProfile ? (
+                    <img src={userProfile} alt="Profile" className=" h-12 w-12 rounded-full cursor-pointer" 
+                    />
+            ):(
+              <Image
+              src={Avatar}
+              alt="User Avatar"
+              className="rounded-full h-10 w-10 cursor-pointer"
+              />
+            )}
+          <div className='flex flex-col gap-4'>
             <h1 className="scroll-m-20 text-2xl font-bold tracking-tight lg:text-4xl">
               Welcome Back, {userName} !
             </h1>
-          </div>
           <div>
             <p className="leading-7 [&:not(:first-child)]:mt-6 text-slate-500">
               Comprehensive analysis of environmental readings, highlighting temperature, humidity, and air quality trends.
             </p>
+          </div>
           </div>
         </div>
       </div>
