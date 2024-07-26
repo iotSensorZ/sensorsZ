@@ -10,6 +10,7 @@ import { MagnifyingGlassIcon, ArrowUpIcon, ArrowDownIcon } from '@heroicons/reac
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import {motion} from 'framer-motion'
 
 
 interface Report {
@@ -29,6 +30,22 @@ const ReportList = () => {
   const [showMyReports, setShowMyReports] = useState(false);
   const { currentUser } = useAuth();
   const router = useRouter();
+
+
+  const fadeInAnimationsVariants={
+    initial:{
+      opacity:0,
+      y:100
+    },
+    animate: (index:number) => ({
+      opacity:1,
+      y:0,
+      transition:{
+        delay:0.05*index
+      }
+    }
+  )
+  }
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -124,7 +141,10 @@ const ReportList = () => {
 
 
   return (
-    <div className="">
+    <motion.div variants={fadeInAnimationsVariants}
+   initial="initial" whileInView="animate"
+  //  viewport={{once:true}}
+   custom={10} className="">
 
 
       <div
@@ -220,6 +240,11 @@ const ReportList = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredReports.map((report) => (
 
+<motion.div variants={fadeInAnimationsVariants}
+initial="initial" whileInView="animate"
+ viewport={{once:true}}
+custom={10}>
+
             <Card key={report.id} className="w-[350px]">
               <CardHeader>
                 <CardTitle className='font-medium'>{report.title}</CardTitle>
@@ -253,12 +278,12 @@ const ReportList = () => {
                   </div>
                 )}
               </CardFooter>
-            </Card>
+            </Card></motion.div>
           ))}
         </div>
       </div>
 
-    </div>
+    </motion.div>
   );
 };
 

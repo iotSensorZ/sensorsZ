@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { motion } from "framer-motion"
 import FolderModal from '../folderModel/page';
 
 const StorageList = () => {
@@ -25,6 +26,21 @@ const StorageList = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const router = useRouter();
   const predefinedFolders = ['cards', 'personal', 'work', 'photos'];
+
+  const fadeInAnimationsVariants={
+    initial:{
+      opacity:0,
+      y:100
+    },
+    animate: (index:number) => ({
+      opacity:1,
+      y:0,
+      transition:{
+        delay:0.05*index
+      }
+    }
+  )
+  }
 
   useEffect(() => {
     const fetchFolders = async () => {
@@ -123,7 +139,11 @@ const StorageList = () => {
   }
 
   return (
-    <div className="font-medium grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <motion.div
+    variants={fadeInAnimationsVariants}
+ initial="initial" whileInView="animate"
+ viewport={{once:true}}
+ custom={20} className="font-medium grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {predefinedFolders.map(folder => (
         <Card key={folder} className="bg-white shadow-md cursor-pointer" onClick={() => handleFolderClick(folder)}>
           <CardContent>
@@ -156,7 +176,7 @@ const StorageList = () => {
         </CardContent>
       </Card>
       <FolderModal open={isModalOpen} onClose={handleCloseModal} />
-    </div>
+    </motion.div>
   );
 };
 

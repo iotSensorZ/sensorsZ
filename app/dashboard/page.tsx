@@ -20,6 +20,8 @@ import filesvg from '@/public/images/files.svg';
 import inboxsvg from '@/public/images/inbox.svg';
 import { Grip } from 'lucide-react';
 import Avatar from '@/public/images/avatar.jpg'
+import MapComponent from '@/components/MapComponent/page';
+import { motion } from "framer-motion"
 
 const Dashboard = () => {
   const [reports, setReports] = useState<any[]>([]);
@@ -37,6 +39,22 @@ const Dashboard = () => {
   const [userName, setUserName] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [userProfile, setuserProfile] = useState('')
+
+  const fadeInAnimationsVariants={
+    initial:{
+      opacity:0,
+      y:100
+    },
+    animate: (index:number) => ({
+      opacity:1,
+      y:0,
+      transition:{
+        delay:0.05*index
+      }
+    }
+  )
+  }
+
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -129,17 +147,21 @@ const Dashboard = () => {
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="loader border-t-4 border-blue-500 border-solid rounded-full w-8 h-8 animate-spin"></div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="flex justify-center items-center h-screen">
+  //       <div className="loader border-t-4 border-blue-500 border-solid rounded-full w-8 h-8 animate-spin"></div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="">
-      <div className="relative overflow-hidden flex px-16 py-32 md:p-16 bg-white text-slate-800">
+      <motion.div className="relative overflow-hidden flex px-16 py-32 md:p-16 bg-white text-slate-800"
+      variants={fadeInAnimationsVariants}
+   initial="initial" whileInView="animate"
+   viewport={{once:true}}
+   custom={2} >
         <div className="flex flex-row gap-4 mx-auto w-full">
           {userProfile ? (
                     <img src={userProfile} alt="Profile" className=" h-12 w-12 rounded-full cursor-pointer" 
@@ -162,10 +184,38 @@ const Dashboard = () => {
           </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      <div className='p-4 grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-4 mt-4'>
-        <div>
+
+   { loading?  (
+        <div className='grid grid-cols-4 p-4 animate-pulse rounded-lg  gap-4 mt-4'>
+                <div className='h-52 bg-slate-300 animate-pulse rounded-lg'>
+
+                </div>
+                <div className='h-52 bg-slate-300 animate-pulse rounded-lg'>
+
+                </div>
+                <div className='h-52 bg-slate-300 animate-pulse rounded-lg'>
+
+                </div>
+                <div className='h-52 bg-slate-300 animate-pulse rounded-lg'>
+
+                </div>
+                
+                </div>
+           ) :
+
+
+
+      <motion.div 
+        initial={{opacity:0,y:-50}}
+        animate={{opacity:1,y:0}}
+        transition={{duration:1}} 
+       className='p-4 grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-4 mt-4'>
+       <motion.div variants={fadeInAnimationsVariants}
+   initial="initial" whileInView="animate"
+  //  viewport={{once:true}}
+   custom={5}>
           <Card className='text-center text-blue-600'><Grip className='' />
             <CardHeader className='flex justify-center items-center'>
               <Image src={Reportsvg} alt='repo' width={60} height={60} />
@@ -177,8 +227,14 @@ const Dashboard = () => {
             <CardContent>
             </CardContent>
           </Card>
-        </div>
-        <div>
+          </motion.div>
+        
+
+
+       <motion.div variants={fadeInAnimationsVariants}
+   initial="initial" whileInView="animate"
+  //  viewport={{once:true}}
+   custom={5}>
           <Card className='text-center text-yellow-600 '><Grip className='' />
             <CardHeader className='flex justify-center items-center'>
               <Image src={filesvg} alt='repo' width={60} height={60} />
@@ -190,8 +246,11 @@ const Dashboard = () => {
             <CardContent>
             </CardContent>
           </Card>
-        </div>
-        <div>
+        </motion.div>
+        <motion.div variants={fadeInAnimationsVariants}
+   initial="initial" whileInView="animate"
+  //  viewport={{once:true}}
+   custom={5}>
           <Card className='text-center text-red-600 '><Grip className='' />
             <CardHeader className='flex justify-center items-center'>
               <Image src={eventsvg} alt='repo' width={60} height={60} />
@@ -203,8 +262,11 @@ const Dashboard = () => {
             <CardContent>
             </CardContent>
           </Card>
-        </div>
-        <div>
+        </motion.div>
+        <motion.div variants={fadeInAnimationsVariants}
+   initial="initial" whileInView="animate"
+  //  viewport={{once:true}}
+   custom={5}>
           <Card className='text-center text-violet-600 '><Grip className='' />
             <CardHeader className='flex justify-center items-center'>
               <Image src={inboxsvg} alt='repo' width={60} height={60} />
@@ -216,10 +278,15 @@ const Dashboard = () => {
             <CardContent>
             </CardContent>
           </Card>
-        </div>
-      </div>
-
-      <div className='m-5 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 mt-14'>
+        </motion.div>
+      </motion.div>
+            }
+      <motion.div
+        initial={{opacity:0,y:-50}}
+        animate={{opacity:1,y:0,x:-10}}
+        // transition={{duration:1}}  
+        transition={{ ease: "easeOut", duration: 2 }}
+      className='m-5 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 mt-14'>
         <div>
           <Card className=''>
             <CardDescription className='text-center mt-2'><Grip className='mx-4' />recent reports</CardDescription>
@@ -271,7 +338,11 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </motion.div>
+
+<div className='m-2'>
+      <MapComponent/>
+</div>
 
       <button
         className="fixed bottom-4 right-4 bg-blue-500 text-white p-6 rounded-full shadow-lg hover:bg-blue-700"
