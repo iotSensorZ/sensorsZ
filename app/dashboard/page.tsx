@@ -22,7 +22,11 @@ import { Grip } from 'lucide-react';
 import Avatar from '@/public/images/avatar.jpg'
 import MapComponent from '@/components/MapComponent/page';
 import { motion } from "framer-motion"
+import { Button } from '@/components/ui/button';
+import { Mail } from 'lucide-react';
+import { UserCog } from 'lucide-react';
 
+import Link from 'next/link';
 const Dashboard = () => {
   const [reports, setReports] = useState<any[]>([]);
   const [files, setFiles] = useState<any[]>([]);
@@ -174,14 +178,25 @@ const Dashboard = () => {
               />
             )}
           <div className='flex flex-col gap-4'>
+            <div className='flex justify-between'>
             <h1 className="scroll-m-20 text-2xl font-bold tracking-tight lg:text-4xl">
               Welcome Back, {userName} !
             </h1>
-          <div>
+            <div className='flex gap-4'>
+              <Link href='messanger'>
+          <Button className='justify-end rounded-full gap-2' > <Mail />Messages</Button>
+              </Link>
+              <Link href='myprofile'>
+          <Button className='justify-end gap-2' variant='purple'><UserCog/>Profile</Button>
+              </Link>
+            </div>
+            </div>
+          <div className='flex'>
             <p className="leading-7 [&:not(:first-child)]:mt-6 text-slate-500">
               Comprehensive analysis of environmental readings, highlighting temperature, humidity, and air quality trends.
             </p>
           </div>
+
           </div>
         </div>
       </motion.div>
@@ -294,7 +309,7 @@ const Dashboard = () => {
               <ul className='mt-4'>
                 {reports.map(report => (
                   <a key={report.id} href={report.url} target="_blank" rel="noopener noreferrer" className="text-slate-500 ">
-                    <li key={report.id} className='transition ease-in-out delay-350 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-200 duration-300  mb-1  border border-blue-50 rounded p-1 flex'>
+                    <li key={report.id} className='transition ease-in-out delay-350 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-200 duration-300  mb-1  border-b border-blue-50 rounded py-2 flex'>
                       <Image src={Reportsvg} alt='repo' width={20} height={20} />
                       <p className='mx-5'>{report.title}</p>
                     </li>
@@ -311,7 +326,7 @@ const Dashboard = () => {
               <ul className='mt-4'>
                 {files.map(file => (
                   <a key={file.id} href={file.url} target="_blank" rel="noopener noreferrer" className="text-slate-500 ">
-                    <li key={file.id} className='transition ease-in-out delay-350 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-200 duration-300  mb-1  border border-blue-50 rounded p-1 flex'>
+                    <li key={file.id} className='transition ease-in-out delay-350 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-200 duration-300  mb-1  border-b border-blue-50 rounded py-2 flex'>
                       <Image src={filesvg} alt='repo' width={20} height={20} />
                       <p className='mx-5'>{file.name}</p>
                     </li>
@@ -328,7 +343,7 @@ const Dashboard = () => {
               <ul className='mt-4'>
                 {events.map(event => (
                   <a key={event.id} href={event.url} target="_blank" rel="noopener noreferrer" className="text-slate-500 ">
-                    <li key={event.id} className='transition ease-in-out delay-350 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-200 duration-300  mb-1  border border-blue-50 rounded p-1 flex'>
+                    <li key={event.id} className='transition ease-in-out delay-350 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-200 duration-300  mb-1  border-b border-blue-50 rounded py-2 flex'>
                       <Image src={eventsvg} alt='repo' width={20} height={20} />
                       <p className='mx-5'>{event.title}</p>
                     </li>

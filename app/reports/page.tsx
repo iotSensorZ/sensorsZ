@@ -141,13 +141,11 @@ const ReportList = () => {
 
 
   return (
-    <motion.div variants={fadeInAnimationsVariants}
+    <div className="">
+      <motion.div  variants={fadeInAnimationsVariants}
    initial="initial" whileInView="animate"
-  //  viewport={{once:true}}
-   custom={10} className="">
-
-
-      <div
+   viewport={{once:true}}
+   custom={2} 
         className="relative overflow-hidden flex  items-center justify-center px-16 py-32 md:p-20 bg-slate-800 text-white"
       >
         <div className="flex flex-col items-center justify-center  mx-auto w-full">
@@ -203,9 +201,12 @@ const ReportList = () => {
             />
           </g>
         </svg>
-      </div>
+      </motion.div>
 
-      <div className='p-6'>
+      <motion.div variants={fadeInAnimationsVariants}
+   initial="initial" whileInView="animate"
+   viewport={{once:true}}
+   custom={10}  className='p-6'>
 
         {/* <h1 className="text-2xl font-bold mb-4">Reports</h1> */}
         <div className="mb-4 flex items-center justify-between">
@@ -281,9 +282,9 @@ custom={10}>
             </Card></motion.div>
           ))}
         </div>
-      </div>
+      </motion.div>
 
-    </motion.div>
+    </div>
   );
 };
 

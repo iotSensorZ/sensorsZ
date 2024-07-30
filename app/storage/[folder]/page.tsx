@@ -14,6 +14,23 @@ import { useRouter, useParams } from 'next/navigation';
 import { toast } from 'sonner';
 import FileUpload from '@/components/fileupload/page';
 import { CardFooter, CardHeader } from '@/components/ui/card';
+import { motion } from "framer-motion"
+
+
+const fadeInAnimationsVariants={
+  initial:{
+    opacity:0,
+    y:100
+  },
+  animate: (index:number) => ({
+    opacity:1,
+    y:0,
+    transition:{
+      delay:0.05*index
+    }
+  }
+)
+}
 
 const FolderPage = () => {
   const [files, setFiles] = useState<any[]>([]);
@@ -97,8 +114,10 @@ const FolderPage = () => {
 
   return (
     <div className="">
-       <div
-        className="relative overflow-hidden flex  px-10 py-10 md:p-10 bg-slate-200 text-black">
+             <motion.div variants={fadeInAnimationsVariants}
+    initial="initial" whileInView="animate"
+    viewport={{once:true}}
+    custom={2} className="relative overflow-hidden flex  px-10 py-10 md:p-10 bg-slate-200 text-black">
         <div className="flex flex-col  mx-auto w-full">
           <div>
             <h3 className="scroll-m-20 border-b pb-2 text-3xl font-bold tracking-tight first:mt-0">
@@ -106,10 +125,13 @@ const FolderPage = () => {
             </h3>
           </div>
         </div>
-      </div>
+      </motion.div>
 
 
-<div className="p-4">
+      <motion.div variants={fadeInAnimationsVariants}
+    initial="initial" whileInView="animate"
+    viewport={{once:true}}
+    custom={10} className="p-4">
 
       <FileUpload folder={folder} onUploadComplete={fetchFiles}/>
       <div className="p-4 rounded-xl font-medium grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4  bg-slate-200">
@@ -133,7 +155,7 @@ const FolderPage = () => {
         ))}
         {files.length==0&&<p className='text-slate-500'> No files uploaded </p>}
       </div>
-    </div>
+    </motion.div>
 
 </div>
 

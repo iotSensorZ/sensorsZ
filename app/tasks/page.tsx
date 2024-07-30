@@ -9,6 +9,29 @@ import { firestore } from '@/firebase/firebase';
 import { collection, addDoc, getDocs } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import { useAuth } from '@/context/AuthContext';
+import { motion } from "framer-motion"
+
+
+const fadeInAnimationsVariants={
+  initial:{
+    opacity:0,
+    y:100
+  },
+  animate: (index:number) => ({
+    opacity:1,
+    y:0,
+    transition:{
+      delay:0.05*index
+    }
+  }
+)
+}
+interface Contact {
+  id?: string; // Include the document ID for editing and deleting
+  Name: string;
+  Phone: string;
+  Email: string;
+}
 
 interface Task {
   id: string;
@@ -76,7 +99,10 @@ const Tasks: React.FC = () => {
   return (
     <div className=''>
 
-<div className="relative overflow-hidden flex  px-8 py-4 md:p-8 bg-white text-black">
+<motion.div variants={fadeInAnimationsVariants}
+    initial="initial" whileInView="animate"
+    viewport={{once:true}}
+    custom={2} className="relative overflow-hidden flex  px-8 py-4 md:p-8 bg-white text-black">
         <div className="flex flex-col  mx-auto w-full">
           <div>
             <h3 className="scroll-m-20 text-lg font-medium ">
@@ -90,10 +116,13 @@ const Tasks: React.FC = () => {
           </div>
         </div>
         
-        </div>
+        </motion.div>
 
 
-      <div className="mx-4 p-4 flex justify-center">
+        <motion.div variants={fadeInAnimationsVariants}
+    initial="initial" whileInView="animate"
+    viewport={{once:true}}
+    custom={2} className="mx-4 p-4 flex justify-center">
         <Input
           type="text"
           placeholder="New Task"
@@ -102,7 +131,7 @@ const Tasks: React.FC = () => {
           className="w-3/4 p-2 border border-gray-300 rounded mb-2"
         />
         <Button variant='purple' onClick={handleAddTask} className="ml-2">Add Task</Button>
-      </div>
+      </motion.div>
       <DndContext sensors={sensors} onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
         <TaskColumn tasks={tasks} setTasks={setTasks} />
       </DndContext>
