@@ -4,7 +4,29 @@ import { useAuth } from '@/context/AuthContext';
 import NoteCard from '../NoteCard/page';
 import { Button } from '../ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
+import { motion } from "framer-motion"
 
+
+const fadeInAnimationsVariants={
+  initial:{
+    opacity:0,
+    y:100
+  },
+  animate: (index:number) => ({
+    opacity:1,
+    y:0,
+    transition:{
+      delay:0.05*index
+    }
+  }
+)
+}
+interface Contact {
+  id?: string; // Include the document ID for editing and deleting
+  Name: string;
+  Phone: string;
+  Email: string;
+}
 interface Note {
   id: string;
   title: string;
@@ -115,8 +137,10 @@ if(!currentUser)return;
   return (
     <div className="">
 
-<div
-        className="relative overflow-hidden flex  px-8 py-4 md:p-8 bg-slate-100 text-black"
+<motion.div variants={fadeInAnimationsVariants}
+    initial="initial" whileInView="animate"
+    viewport={{once:true}}
+    custom={2} className="relative overflow-hidden flex  px-8 py-4 md:p-8 bg-slate-100 text-black"
       >
         <div className="flex flex-col  mx-auto w-full">
           <div>
@@ -131,11 +155,14 @@ if(!currentUser)return;
           </div>
         </div>
         
-        </div>
+        </motion.div>
 
 <div className='p-4 bg-white'>
 
-<div className='bg-slate-100 p-4 rounded-lg'> 
+<motion.div variants={fadeInAnimationsVariants}
+    initial="initial" whileInView="animate"
+    viewport={{once:true}}
+    custom={10} className='bg-slate-100 p-4 rounded-lg'> 
 
       <div className="mb-4 p-4 align-middle justify-center text-center">
         <Button variant='outline' className='rounded-lg w-2/3 border-[#4F46E5] border-2 text-slate-500 font-light hover:text-slate-400 hover:bg-white' onClick={() => setCreateDialogIsOpen(true)}>Take a note...</Button>
@@ -233,7 +260,7 @@ if(!currentUser)return;
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </motion.div>
     </div>
         
 </div>

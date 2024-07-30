@@ -1,7 +1,29 @@
 import React from 'react';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import TaskList from '../tasklist/page';
+import { motion } from "framer-motion"
 
+
+const fadeInAnimationsVariants={
+  initial:{
+    opacity:0,
+    y:100
+  },
+  animate: (index:number) => ({
+    opacity:1,
+    y:0,
+    transition:{
+      delay:0.05*index
+    }
+  }
+)
+}
+interface Contact {
+  id?: string; // Include the document ID for editing and deleting
+  Name: string;
+  Phone: string;
+  Email: string;
+}
 interface Task {
   id: string;
   title: string;
@@ -15,7 +37,10 @@ interface TaskColumnProps {
 
 const TaskColumn: React.FC<TaskColumnProps> = ({ tasks, setTasks }) => {
   return (
-    <div className='container p-4'>
+<motion.div variants={fadeInAnimationsVariants}
+    initial="initial" whileInView="animate"
+    viewport={{once:true}}
+    custom={10} className='container p-4'>
       {/* <div className='bg-slate-100'>
         TaskColumn
       </div> */}
@@ -29,7 +54,7 @@ const TaskColumn: React.FC<TaskColumnProps> = ({ tasks, setTasks }) => {
           ))}
         </SortableContext>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

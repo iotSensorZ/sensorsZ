@@ -3,6 +3,31 @@ import EmailManagement from '../EmailManagement/page';
 import EmailModal from '../SendEmail/page';
 import { FaMailBulk } from '@react-icons/all-files/fa/FaMailBulk';
 import Link from 'next/link';
+import { motion } from "framer-motion"
+
+
+const fadeInAnimationsVariants={
+  initial:{
+    opacity:0,
+    y:100
+  },
+  animate: (index:number) => ({
+    opacity:1,
+    y:0,
+    transition:{
+      delay:0.05*index
+    }
+  }
+)
+}
+
+interface User {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  profilePicUrl: string;
+}
 
 const InboxList: React.FC = () => {
   const [showEmailCard, setShowEmailCard] = useState(false);
@@ -28,7 +53,10 @@ const InboxList: React.FC = () => {
         <FaMailBulk className='text-lg' />
       </button>
       <EmailModal isOpen={isModalOpen} closeModal={closeModal} />
-
+      <motion.div variants={fadeInAnimationsVariants}
+    initial="initial" whileInView="animate"
+    viewport={{once:true}}
+    custom={15} >
       <p className="text-[#4F46E5] p-2 font-semibold">MAILBOXES</p>
       <ul className="text-slate-600 p-2">  
         <li className="p-2 m-1 rounded-md hover:text-black hover:bg-slate-100 cursor-pointer">
@@ -42,6 +70,7 @@ const InboxList: React.FC = () => {
         <li className="p-2 m-1 rounded-md hover:text-black hover:bg-slate-100 cursor-pointer">Spam</li>
         <li className="p-2 m-1 rounded-md hover:text-black hover:bg-slate-100 cursor-pointer">Trash</li>
       </ul>
+      </motion.div>
       {showEmailCard && (
           <div className=' fixed right-5 top-12 p-5 z-50'>
             <EmailManagement onClose={handleCloseCard} />

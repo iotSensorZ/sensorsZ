@@ -5,6 +5,23 @@ import { collection, doc, getDoc, onSnapshot, orderBy, query, limit, where, getD
 import React, { useEffect, useState } from 'react';
 import Avatar from '@/public/images/avatar.jpg';
 import Image from 'next/image';
+import { motion } from "framer-motion"
+
+
+const fadeInAnimationsVariants={
+  initial:{
+    opacity:0,
+    y:100
+  },
+  animate: (index:number) => ({
+    opacity:1,
+    y:0,
+    transition:{
+      delay:0.05*index
+    }
+  }
+)
+}
 
 interface User {
   id: string;
@@ -106,7 +123,10 @@ const UserList: React.FC<UserListProps> = ({ users, setSelectedUser }) => {
         <h3 className="scroll-m-20 text-2xl font-light">{userName}</h3>
         <p className="scroll-m-20 mt-4 text-xs font-light">{userEmail}</p>
       </div>
-      <div>
+      <motion.div variants={fadeInAnimationsVariants}
+    initial="initial" whileInView="animate"
+    viewport={{once:true}}
+    custom={15} >
         <h2 className="text-[#4F46E5] border-b text-xl mt-10 p-2 font-medium my-4">Chats</h2>
         {sortedUsers.map(user => (
           <div
@@ -137,7 +157,7 @@ const UserList: React.FC<UserListProps> = ({ users, setSelectedUser }) => {
             </div>
           </div>
         ))}
-      </div>
+      </motion.div>
     </div>
   );
 };

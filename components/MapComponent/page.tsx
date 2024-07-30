@@ -12,10 +12,19 @@ import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 const MAP_TOKEN = 'pk.eyJ1Ijoic2hhZ3VuaW52ZW50YWkiLCJhIjoiY2x6MTNnNTZkMm9mbjJpcjRiaHhteXh1cSJ9.xlSRFEbugcLgZxi4mDfQ8A';
 import {motion} from 'framer-motion'
+import { useAuth } from '@/context/AuthContext';
+import { MapPin } from 'lucide-react';
+import { Timer } from 'lucide-react';
+import { Star } from 'lucide-react';
+import { ClipboardList } from 'lucide-react';
+import { CircleDot } from 'lucide-react';
+import Link from 'next/link';
+import { Settings } from 'lucide-react';
 
-interface Location {
+interface Resource {
   id: string;
   name: string;
+  type:string;
   description: string;
   address: string;
   latitude: number;
@@ -74,12 +83,15 @@ const fadeInAnimationsVariants={
   }
 )
 }
+
+const [resources, setResources] = useState<Resource[]>([]);
 const [hoveredMarker, setHoveredMarker] = useState<any>(null);
 const [markers, setMarkers] = useState([]);
 const [selectedMarker, setSelectedMarker] = useState<any>(null);
   const [filter, setFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
-
+  
+const currentUser = useAuth();
 
   const handleViewportChange = (newViewport: any) => {
     setViewport({
@@ -89,11 +101,29 @@ const [selectedMarker, setSelectedMarker] = useState<any>(null);
       zoom: newViewport.zoom
     });
   };
-  const filteredLocations = locations.filter(location => 
-    (filter === 'all' || location.type === filter) &&
-    (location.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-     location.address.toLowerCase().includes(searchQuery.toLowerCase()))
+
+
+  const fetchResources = async () => {
+    if (currentUser) {
+      try {
+        const response = await axios.get('/api/resources');
+        setResources(response.data);
+      } catch (error) {
+        console.error('Error fetching resources:', error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchResources();
+  }, [currentUser]);
+
+  const filteredResources = resources.filter(resource =>
+    (filter === 'all' || resource.type === filter) &&
+    (resource.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      resource.address.toLowerCase().includes(searchQuery.toLowerCase()))
   );
+
   return(
     <>
     
@@ -109,19 +139,25 @@ const [selectedMarker, setSelectedMarker] = useState<any>(null);
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
-              <SelectItem value="hospital">Hospitals</SelectItem>
-              <SelectItem value="school">Schools</SelectItem>
+              <SelectItem value="hotel">Hotel</SelectItem>
+              <SelectItem value="school">school</SelectItem>
               {/* Add more filter options as needed */}
             </SelectContent>
           </Select>
         </div>
+
+        <div className='justify-between flex m-4'>
         <input
             type="text"
             placeholder="Search by name or address"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="p-2 border border-gray-300 rounded"
-          />
+            />
+            <Link href='adminDash'>
+          <Button className='justify-end gap-2' variant='purple'> <Settings />Settings</Button>
+            </Link>
+            </div>
       <Map
         {...viewport}
         mapStyle="mapbox://styles/mapbox/streets-v11"
@@ -130,9 +166,9 @@ const [selectedMarker, setSelectedMarker] = useState<any>(null);
         dragPan={true}
         dragRotate={true}
       >
-                {filteredLocations.map(location => (
+                {filteredResources.map((location, index) => (
           <Marker 
-            key={location.name}
+            key={location.id}
             latitude={location.latitude}
             longitude={location.longitude}
             onClick={() => setSelectedMarker(location)}
@@ -169,22 +205,24 @@ const [selectedMarker, setSelectedMarker] = useState<any>(null);
 
       <Dialog open={Boolean(selectedMarker)} onOpenChange={() => setSelectedMarker(null)}>
         <DialogContent>
-          <DialogHeader>
-            <DialogTitle className='text-center text-lg'>{selectedMarker?.name}</DialogTitle>
-          </DialogHeader>
+          {/* <DialogHeader> */}
+            {/* <DialogTitle className='text-center text-3xl text-slate-700'>{selectedMarker?.name}</DialogTitle> */}
+          {/* </DialogHeader> */}
           <div className="grid gap-4 py-4 justify-center">
-            <p>{selectedMarker?.description}</p>
-            <p>{selectedMarker?.address}</p>
-            <p>Hours: {selectedMarker?.openingHours}</p>
-            <p>Rating: {selectedMarker?.rating}</p>
-            <Image src={selectedMarker?.image} width={200} height={200} alt='img'/>
+            <p className='font-light text-center text-md text-3xl text-slate-700'>{selectedMarker?.name}</p>
+            <p className='font-light text-md flex gap-3'><CircleDot className='text-slate-500'/>{selectedMarker?.type}</p>
+            <p className='flex gap-3'>   <ClipboardList className='text-slate-500' />Description : {selectedMarker?.description}</p>
+            <p className='flex gap-3'> <MapPin className='text-slate-500' /> Address: {selectedMarker?.address}</p>
+            <p className='flex gap-3'>    <Timer className='text-slate-500' />Opening Hours: {selectedMarker?.openingHours}</p>
+            <p className='flex gap-3'> <Star className='text-slate-500' />Rating: {selectedMarker?.rating}</p>
+            {selectedMarker?.image && 
+            <Image src={selectedMarker?.image} width={200} height={200} alt='img'/>}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setSelectedMarker(null)}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
 
     </motion.div>
     </>

@@ -7,7 +7,23 @@ import React, { useEffect, useState } from 'react';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
+import { motion } from "framer-motion"
 
+
+const fadeInAnimationsVariants={
+  initial:{
+    opacity:0,
+    y:100
+  },
+  animate: (index:number) => ({
+    opacity:1,
+    y:0,
+    transition:{
+      delay:0.05*index
+    }
+  }
+)
+}
 interface UserProfile {
   firstName?: string;
   lastName?: string;
@@ -106,7 +122,10 @@ const ProfilePage = () => {
   }
 
   return (
-    <div>
+    <motion.div variants={fadeInAnimationsVariants}
+    initial="initial" whileInView="animate"
+    viewport={{once:true}}
+    custom={2}>
 
       <div className="flex flex-col  mx-auto w-full">
           <div className='flex'>
@@ -269,7 +288,7 @@ const ProfilePage = () => {
           </div>
         </div>
       </div>
-    </div>
+      </motion.div>
   );
 };
 
