@@ -101,5 +101,7 @@ overview of the firebase schema
 
 ```
 
-![Screenshot (16)](https://github.com/iotSensorZ/sensorsZ/assets/172040357/4e66ef06-4644-45cf-848e-91aa80515586)
+![Unnamed File (1)](https://github.com/user-attachments/assets/4ea414f4-fb71-4cbb-ac5b-fc08ca898e75)
+
+
 
