@@ -28,7 +28,7 @@ import { FaFileSignature } from "@react-icons/all-files/fa/FaFileSignature";
 import EmailManagement from '../EmailManagement/page';
 import Avatar from '@/public/images/avatar.jpg'
 import Image from 'next/image';
-import { Loader2 } from 'lucide-react';
+import { Globe, Loader2 } from 'lucide-react';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -219,6 +219,12 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   {isSidebarOpen && "Write Report"}
               </Link>
             </li>
+            <li className={`p-4 mb-2 hover:bg-slate-800 hover:text-white hover:font-semibold  hover:rounded-lg flex items-center ${isLinkActive('/resources')}`}>
+            <Link href="/resources" className="flex items-center w-full" onClick={() => handleSidebarItemClick('/resources')}>
+                  <Globe className="mr-2" />
+                  {isSidebarOpen && "Resources"}
+              </Link>
+            </li>
             <li className={`p-4 mb-2  hover:bg-slate-800 hover:text-white hover:font-semibold hover:rounded-lg flex items-center ${isLinkActive('/mycalendar')}`}>
             <Link href="/mycalendar" className="flex items-center w-full" onClick={() => handleSidebarItemClick('/mycalendar')}>
                   <FaCalendarAlt className="mr-2" />
@@ -292,6 +298,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </Link>
           <Link href='/reports' className='p-2 hover:bg-slate-200'>
           <FaFileAlt/>
+          </Link>
+          <Link href='/resources' className='p-2 hover:bg-slate-200'>
+          <Globe/>
           </Link>
             </div>
           <div className="flex justify-end items-center gap-4">
