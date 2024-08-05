@@ -19,11 +19,13 @@ overview of the firebase schema
 │   │   ├── FirstName: string
 │   │   ├── LastName: string
 │   │   ├
-│   │   ├── files
-│   │   │   ├── {fileId}
-│   │   │       ├── name: string
-│   │   │       ├── url: string
-│   │   │       ├── createdAt: timestamp
+│   │   ├── folders
+│   │   │   ├── {foldername}
+│   │   │       ├── files
+|   │   │   │       ├── {filename}
+|   |   │   │   │       ├── name
+|   |   │   │   │       ├── url
+|   |   │   │   │       ├── createdAt
 │   │   ├── events
 │   │   │   ├── {eventId}
 │   │   │       ├── title: string
@@ -36,6 +38,22 @@ overview of the firebase schema
 │   │   │   ├── {eventId}
 │   │   │       ├── email: string
 │   │   │       ├── verified: string
+│   │   ├── notes
+│   │   │   ├── {notesId}
+│   │   │       ├── userId: string
+│   │   │       ├── title: string
+│   │   │       ├── content: string
+│   │   │       ├── label: string
+│   │   ├── tasks
+│   │   │   ├── {taskId}
+│   │   │       ├── title: string
+│   │   │       ├── done: bool
+│   │   ├── contacts
+│   │   │   ├── {contactId}
+│   │   │       ├── email: string
+│   │   │       ├── name: string
+│   │   │       ├── phone: string
+│   │   │       ├── id: string
 │   |   |── messages
 │   |   |   ├── {messageId}
 │   |   |       ├── senderId: string
@@ -58,6 +76,20 @@ overview of the firebase schema
 │   │   ├── content: string
 │   │   ├── createdAt: timestamp
 │   │   ├── read: boolean
+├── resources
+│   ├── {resourceId}
+│   │   ├── name: string
+│   │   ├── id: string
+│   │   ├── address: string
+│   │   ├── description:string
+│   │   ├── image: string
+│   │   ├── latitude: number
+│   │   ├── longitude: number
+│   │   ├── openinghours:string
+│   │   ├── rating: string
+│   │   ├── type:string
+
+
 
 ```
 
