@@ -76,6 +76,14 @@ overview of the firebase schema
 │   │   ├── content: string
 │   │   ├── createdAt: timestamp
 │   │   ├── read: boolean
+├── chats
+│   ├── {senderId_receiverId}
+│   │   ├── messages
+│   │   │   ├── {messageId}
+│   │   │       ├── senderId: string
+│   │   │       ├── receiverId: string
+│   │   │       ├── text: string
+│   │   │       ├── createdAt: timestamp
 ├── resources
 │   ├── {resourceId}
 │   │   ├── name: string
