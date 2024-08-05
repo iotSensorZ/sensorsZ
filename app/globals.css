@@ -74,3 +74,10 @@
       @apply bg-background text-foreground;
     }
   }
+
+  .marker {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
