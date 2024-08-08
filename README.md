@@ -19,11 +19,13 @@ overview of the firebase schema
 │   │   ├── FirstName: string
 │   │   ├── LastName: string
 │   │   ├
-│   │   ├── files
-│   │   │   ├── {fileId}
-│   │   │       ├── name: string
-│   │   │       ├── url: string
-│   │   │       ├── createdAt: timestamp
+│   │   ├── folders
+│   │   │   ├── {foldername}
+│   │   │       ├── files
+|   │   │   │       ├── {filename}
+|   |   │   │   │       ├── name
+|   |   │   │   │       ├── url
+|   |   │   │   │       ├── createdAt
 │   │   ├── events
 │   │   │   ├── {eventId}
 │   │   │       ├── title: string
@@ -36,6 +38,22 @@ overview of the firebase schema
 │   │   │   ├── {eventId}
 │   │   │       ├── email: string
 │   │   │       ├── verified: string
+│   │   ├── notes
+│   │   │   ├── {notesId}
+│   │   │       ├── userId: string
+│   │   │       ├── title: string
+│   │   │       ├── content: string
+│   │   │       ├── label: string
+│   │   ├── tasks
+│   │   │   ├── {taskId}
+│   │   │       ├── title: string
+│   │   │       ├── done: bool
+│   │   ├── contacts
+│   │   │   ├── {contactId}
+│   │   │       ├── email: string
+│   │   │       ├── name: string
+│   │   │       ├── phone: string
+│   │   │       ├── id: string
 │   |   |── messages
 │   |   |   ├── {messageId}
 │   |   |       ├── senderId: string
@@ -58,8 +76,32 @@ overview of the firebase schema
 │   │   ├── content: string
 │   │   ├── createdAt: timestamp
 │   │   ├── read: boolean
+├── chats
+│   ├── {senderId_receiverId}
+│   │   ├── messages
+│   │   │   ├── {messageId}
+│   │   │       ├── senderId: string
+│   │   │       ├── receiverId: string
+│   │   │       ├── text: string
+│   │   │       ├── createdAt: timestamp
+├── resources
+│   ├── {resourceId}
+│   │   ├── name: string
+│   │   ├── id: string
+│   │   ├── address: string
+│   │   ├── description:string
+│   │   ├── image: string
+│   │   ├── latitude: number
+│   │   ├── longitude: number
+│   │   ├── openinghours:string
+│   │   ├── rating: string
+│   │   ├── type:string
+
+
 
 ```
 
-![Screenshot (16)](https://github.com/iotSensorZ/sensorsZ/assets/172040357/4e66ef06-4644-45cf-848e-91aa80515586)
+![Unnamed File (1)](https://github.com/user-attachments/assets/4ea414f4-fb71-4cbb-ac5b-fc08ca898e75)
+
+
 
