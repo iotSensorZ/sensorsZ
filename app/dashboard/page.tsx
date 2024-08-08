@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth, firestore, storage } from '@/firebase/firebase';
 import { collection, getDocs, query, orderBy, limit, getCountFromServer, doc, getDoc } from 'firebase/firestore';
@@ -40,9 +40,14 @@ const Dashboard = () => {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentInbox, setCurrentInbox] = useState<string | null>(null);
-  const [userName, setUserName] = useState<string | null>(null);
+  // const [userName, setUserName] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [userProfile, setuserProfile] = useState('')
+  // const [userProfile, setuserProfile] = useState('')
+
+  const [userName, setUserName] = useState<string | null>(() => localStorage.getItem('userName'));
+  const [userProfile, setuserProfile] = useState<string | null>(() => localStorage.getItem('userProfile'));
+  const [loadingProfile, setLoadingProfile] = useState(true);
+
 
   const fadeInAnimationsVariants={
     initial:{
@@ -63,90 +68,106 @@ const Dashboard = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user && user.uid) {
-        setCurrentUserId(user.uid);
-        const userDocRef = doc(firestore, "users", user.uid);
-        const userDoc = await getDoc(userDocRef);
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          setUserName(`${userData.firstName} ${userData.lastName}`);
-          setuserProfile(userData.profilePicUrl)
+        try {
+          setLoadingProfile(true);
+          const userDocRef = doc(firestore, "users", user.uid);
+          const userDoc = await getDoc(userDocRef);
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            const fullName = `${userData.firstName} ${userData.lastName}`;
+            const profilePicUrl = userData.profilePicUrl || Avatar.src;
+
+            setUserName(fullName);
+            setuserProfile(profilePicUrl);
+
+            // Store in localStorage to speed up future loads
+            localStorage.setItem('userName', fullName);
+            localStorage.setItem('userProfile', profilePicUrl);
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        } finally {
+          setLoadingProfile(false);
         }
       } else {
-        setCurrentUserId(null);
+        setUserName(null);
+        setuserProfile(null);
+        setLoadingProfile(false);
       }
     });
 
     return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!currentUser) {
-        setError('User not logged in');
-        setLoading(false);
-        return;
-      }
 
-      try {
-        const reportsRef = collection(firestore, 'reports');
-        const filesRef = collection(firestore, 'users', currentUser.uid, 'files');
-        const eventsRef = collection(firestore, 'users', currentUser.uid, 'events');
-        const inboxRef = collection(firestore, 'users', currentUser.uid, 'messages');
-
-        const [reportSnapshot, fileSnapshot, eventSnapshot, inboxSnapshot] = await Promise.all([
-          getDocs(query(reportsRef, orderBy('createdAt', 'desc'), limit(5))),
-          getDocs(query(filesRef, orderBy('createdAt', 'desc'), limit(5))),
-          getDocs(query(eventsRef, orderBy('start', 'desc'), limit(5))),
-          getDocs(query(inboxRef, orderBy('createdAt', 'desc'), limit(5)))
-        ]);
-
-        const reportData = reportSnapshot.docs.map((doc) => ({
-          id: doc.id, ...doc.data()
-        }));
-
-        const fileData = await Promise.all(
-          fileSnapshot.docs.map(async (doc) => {
-            const fileData = doc.data();
-            const fileRef = ref(storage, `users/${currentUser.uid}/files/${fileData.name}`);
-            try {
-              const downloadURL = await getDownloadURL(fileRef);
-              return { ...fileData, id: doc.id, url: downloadURL };
-            } catch (err) {
-              console.error('Error getting download URL:', err);
-              return null;
-            }
-          })
-        );
-
-        const eventData = eventSnapshot.docs.map((doc) => ({
-          id: doc.id, ...doc.data()
-        }));
-
-        setReports(reportData);
-        setFiles(fileData);
-        setEvents(eventData);
-
-        const [reportCount, fileCount, eventCount, inboxCount] = await Promise.all([
-          getCountFromServer(reportsRef),
-          getCountFromServer(filesRef),
-          getCountFromServer(eventsRef),
-          getCountFromServer(inboxRef)
-        ]);
-
-        setReponum(reportCount.data().count);
-        setFilenum(fileCount.data().count);
-        setEventnum(eventCount.data().count);
-        setInboxnum(inboxCount.data().count);
-
-      } catch (err) {
-        console.error("error fetching", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
+  const fetchData = useCallback(async () => {
+    if (!currentUser) {
+      setError('User not logged in');
+      setLoading(false);
+      return;
+    }
+  
+    try {
+      const reportsRef = collection(firestore, 'reports');
+      const filesRef = collection(firestore, 'users', currentUser.uid, 'files');
+      const eventsRef = collection(firestore, 'users', currentUser.uid, 'events');
+      const inboxRef = collection(firestore, 'users', currentUser.uid, 'messages');
+  
+      const [reportSnapshot, fileSnapshot, eventSnapshot, inboxSnapshot] = await Promise.all([
+        getDocs(query(reportsRef, orderBy('createdAt', 'desc'), limit(5))),
+        getDocs(query(filesRef, orderBy('createdAt', 'desc'), limit(5))),
+        getDocs(query(eventsRef, orderBy('start', 'desc'), limit(5))),
+        getDocs(query(inboxRef, orderBy('createdAt', 'desc'), limit(5)))
+      ]);
+  
+      const reportData = reportSnapshot.docs.map((doc) => ({
+        id: doc.id, ...doc.data()
+      }));
+  
+      const fileData = await Promise.all(
+        fileSnapshot.docs.map(async (doc) => {
+          const fileData = doc.data();
+          const fileRef = ref(storage, `users/${currentUser.uid}/files/${fileData.name}`);
+          try {
+            const downloadURL = await getDownloadURL(fileRef);
+            return { ...fileData, id: doc.id, url: downloadURL };
+          } catch (err) {
+            console.error('Error getting download URL:', err);
+            return null;
+          }
+        })
+      );
+  
+      const eventData = eventSnapshot.docs.map((doc) => ({
+        id: doc.id, ...doc.data()
+      }));
+  
+      const [reportCount, fileCount, eventCount, inboxCount] = await Promise.all([
+        getCountFromServer(reportsRef),
+        getCountFromServer(filesRef),
+        getCountFromServer(eventsRef),
+        getCountFromServer(inboxRef)
+      ]);
+  
+      setReports(reportData);
+      setFiles(fileData);
+      setEvents(eventData);
+      setReponum(reportCount.data().count);
+      setFilenum(fileCount.data().count);
+      setEventnum(eventCount.data().count);
+      setInboxnum(inboxCount.data().count);
+  
+    } catch (err) {
+      console.error("error fetching", err);
+    } finally {
+      setLoading(false);
+    }
   }, [currentUser]);
+  
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+  
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -168,7 +189,7 @@ const Dashboard = () => {
    custom={2} >
         <div className="flex flex-row gap-4 mx-auto w-full">
           {userProfile ? (
-                    <img src={userProfile} alt="Profile" className=" h-12 w-12 rounded-full cursor-pointer" 
+                    <img src={userProfile} alt="Profile" className=" h-12 w-12 rounded-full cursor-pointer"  loading="lazy" 
                     />
             ):(
               <Image

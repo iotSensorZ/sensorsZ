@@ -87,21 +87,16 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return () => unsubscribe();
   }, [router,user]);
 
+  const handleResize = () => {
+    setIsSidebarOpen(window.innerWidth >= 588);
+  };
+  
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 588) {
-        setIsSidebarOpen(false);
-      } else {
-        setIsSidebarOpen(true);
-      }
-    };
-
     handleResize();
-
     window.addEventListener('resize', handleResize);
-
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+  
 
 
   
@@ -178,7 +173,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <li className={`p-4 mb-2 justify-center flex items-center`}>
           {userProfile ? (
                     <img src={userProfile} alt="Profile" className=" h-12 w-12 rounded-full cursor-pointer" 
-                    onClick={handleAvatarClick}/>
+                    onClick={handleAvatarClick}   loading="lazy"/>
             ):(
               <Image
               src={Avatar}
@@ -196,7 +191,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </span>
           </li>
           <li className={`p-4 mb-2 hover:bg-slate-800 hover:text-white hover:font-semibold hover:rounded-lg flex items-center ${isLinkActive('/dashboard')}`}>
-          <Link href="/dashboard" className="flex items-center w-full" onClick={() => handleSidebarItemClick('/dashboard')}>
+          <Link href="/dashboard"  prefetch={true} className="flex items-center w-full" onClick={() => handleSidebarItemClick('/dashboard')}>
                   <FaHome className="mr-2" />
                   {isSidebarOpen && "Home"}
               </Link>
@@ -322,7 +317,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 
             {userProfile ? (
-                    <img src={userProfile} alt="Profile" className=" h-12 w-12 rounded-full cursor-pointer" 
+                    <img src={userProfile} alt="Profile" className=" h-12 w-12 rounded-full cursor-pointer"   loading="lazy"
                     onClick={handleAvatarClick}/>
             ):(
               <Image
